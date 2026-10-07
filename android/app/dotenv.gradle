@@ -1,0 +1,4 @@
+project.ext.envConfigFiles = [
+    debug: ".env",
+    release: ".env",
+]
