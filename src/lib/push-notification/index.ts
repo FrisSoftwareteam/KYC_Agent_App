@@ -1,6 +1,13 @@
 import messaging from '@react-native-firebase/messaging';
+import {PermissionsAndroid, Platform} from 'react-native';
 
 export async function requestUserPermission() {
+  // Android 13+ needs the user's permission before any notification can show
+  if (Platform.OS === 'android' && Number(Platform.Version) >= 33) {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+  }
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||

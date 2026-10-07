@@ -52,17 +52,18 @@ export const useInitiated = () => {
   }, []);
 
   useEffect(() => {
-    if (user && isInternetReachable) {
+    if (ably && user && isInternetReachable) {
       const channel: any = ably.channels.get(
         String(`firstCheckAgent-${user?.agentId}`),
       );
-      channel.subscribe('addressNotificationEvent', (message: any) => {
+      const onOffer = (message: any) => {
         dispatch(setAbly(message.data));
         dispatch(setAblyModal(true));
-      });
+      };
+      channel.subscribe('addressNotificationEvent', onOffer);
 
       return () => {
-        channel.unsubscribe(user?.agentId);
+        channel.unsubscribe('addressNotificationEvent', onOffer);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
