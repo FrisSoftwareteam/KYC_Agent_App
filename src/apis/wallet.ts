@@ -39,7 +39,7 @@ const WalletApiFunction = apiSlice.injectEndpoints({
 
     upsertBank: builder.mutation<
       {data: string},
-      {accountNumber: string; bankCode: number}
+      {accountNumber: string; bankCode: string}
     >({
       query: body => ({url: apis.UPSERT_BANK, method: 'POST', body}),
       invalidatesTags: ['Profile'],

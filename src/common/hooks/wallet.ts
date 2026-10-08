@@ -116,10 +116,10 @@ export const useWallet = () => {
       return;
     }
     try {
-      // The server currently expects the bank code as a number.
+      // Send the code as text so leading zeros are kept ("058" is GTBank).
       await upsertBank({
         accountNumber,
-        bankCode: Number(selectedBank.code),
+        bankCode: String(selectedBank.code),
       }).unwrap();
       dispatch(setToast({description: 'Bank account saved', type: 'success'}));
       resetBankForm();
