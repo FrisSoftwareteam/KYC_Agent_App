@@ -41,6 +41,7 @@ const AuthApiFunction = apiSlice.injectEndpoints({
         method: 'GET',
       }),
       keepUnusedDataFor: 60,
+      providesTags: ['Profile'],
     }),
 
     changePassword: builder.mutation<any, TChangePasswordRequest>({

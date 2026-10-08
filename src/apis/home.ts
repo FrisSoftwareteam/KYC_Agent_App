@@ -9,12 +9,14 @@ const HomeApiFunction = apiSlice.injectEndpoints({
         url: `${apis.METRICS}?period=${credentials}`,
         method: 'GET',
       }),
+      providesTags: ['Metrics'],
     }),
     trending: builder.query<TTrending, any>({
       query: credentials => ({
         url: `${apis.TRENDING}?period=${credentials}`,
         method: 'GET',
       }),
+      providesTags: ['Metrics'],
     }),
   }),
 });

@@ -19,6 +19,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         url: `${apis.VERIFICATION}${credentials}`,
         method: 'GET',
       }),
+      providesTags: ['Verification'],
       onQueryStarted: async (arg, {dispatch, queryFulfilled}) => {
         try {
           const parts = arg.split('=');
@@ -50,6 +51,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         url: `${apis.SINGLE_ADDRESS}${credentials}`,
         method: 'GET',
       }),
+      providesTags: ['Verification'],
     }),
 
     acceptTask: builder.mutation<TTaskResponse, TTaskRequest>({
@@ -58,6 +60,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...credentials},
       }),
+      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
     }),
 
     addressStatus: builder.mutation<any, TAddressStatus>({
@@ -66,6 +69,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'PUT',
         body: {...credentials},
       }),
+      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
     }),
 
     submitAddress: builder.mutation<any, TSubmitAddress>({
@@ -74,6 +78,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...credentials},
       }),
+      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
     }),
 
     updateAddressInfo: builder.mutation<any, TAddressInfo>({
@@ -82,6 +87,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'PUT',
         body: {...credentials},
       }),
+      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
     }),
 
     imageUpload: builder.mutation<TUpload, FormData>({
