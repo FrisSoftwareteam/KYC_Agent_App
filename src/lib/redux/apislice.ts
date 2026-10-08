@@ -84,7 +84,7 @@ const baseQueryWithHeaders = async (
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithHeaders,
-  tagTypes: ['Verification', 'Metrics', 'Profile'],
+  tagTypes: ['Verification', 'Metrics', 'Profile', 'Wallet'],
   endpoints: () => ({}),
   refetchOnReconnect: true,
   refetchOnFocus: true,

@@ -60,7 +60,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...credentials},
       }),
-      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
+      invalidatesTags: ['Verification', 'Metrics', 'Profile', 'Wallet'],
     }),
 
     addressStatus: builder.mutation<any, TAddressStatus>({
@@ -69,7 +69,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'PUT',
         body: {...credentials},
       }),
-      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
+      invalidatesTags: ['Verification', 'Metrics', 'Profile', 'Wallet'],
     }),
 
     submitAddress: builder.mutation<any, TSubmitAddress>({
@@ -78,7 +78,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'POST',
         body: {...credentials},
       }),
-      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
+      invalidatesTags: ['Verification', 'Metrics', 'Profile', 'Wallet'],
     }),
 
     updateAddressInfo: builder.mutation<any, TAddressInfo>({
@@ -87,7 +87,7 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         method: 'PUT',
         body: {...credentials},
       }),
-      invalidatesTags: ['Verification', 'Metrics', 'Profile'],
+      invalidatesTags: ['Verification', 'Metrics', 'Profile', 'Wallet'],
     }),
 
     imageUpload: builder.mutation<TUpload, FormData>({
