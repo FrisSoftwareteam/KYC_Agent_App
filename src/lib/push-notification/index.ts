@@ -34,8 +34,18 @@ export const notificationListener = () => {
   // });
 };
 
-export const getToken = async () => {
-  await messaging().registerDeviceForRemoteMessages();
-  const token = await messaging().getToken();
-  return token;
+// Returns the device's push token, or null if it cannot be obtained.
+// Login must still work without it (the agent just won't get push notifications).
+export const getToken = async (): Promise<string | null> => {
+  try {
+    await messaging().registerDeviceForRemoteMessages();
+    return await messaging().getToken();
+  } catch (error: any) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'Push notification token not available:',
+      error?.message || error,
+    );
+    return null;
+  }
 };
