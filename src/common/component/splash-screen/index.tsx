@@ -8,38 +8,59 @@ import {
   setLocationPermission,
   setpermissionIsOpen,
 } from '@/lib/ably/slice';
-import Geolocation from '@react-native-community/geolocation';
-import {PermissionsAndroid} from 'react-native';
+import {AppState, PermissionsAndroid, Platform} from 'react-native';
+
+const P = PermissionsAndroid.PERMISSIONS;
+// Notification permission only exists from Android 13 (API 33). On older phones
+// notifications are allowed by default, so we must not wait for it.
+const needsNotificationPermission =
+  Platform.OS === 'android' && Number(Platform.Version) >= 33;
+
+async function currentPermissions() {
+  const notification = needsNotificationPermission
+    ? await PermissionsAndroid.check(P.POST_NOTIFICATIONS)
+    : true;
+  const fine = await PermissionsAndroid.check(P.ACCESS_FINE_LOCATION);
+  const coarse = await PermissionsAndroid.check(P.ACCESS_COARSE_LOCATION);
+  return {notification, location: fine || coarse};
+}
 
 export function SplashScreen() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const handlePermissions = async () => {
-      try {
-        const notification = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-        );
-
-        dispatch(setNotificationPermission(notification === 'granted'));
-
-        Geolocation.requestAuthorization(
-          () => dispatch(setLocationPermission(true)),
-          () => {
-            dispatch(setLocationPermission(false));
-            dispatch(setpermissionIsOpen(true));
-          },
-        );
-
-        if (notification !== PermissionsAndroid.RESULTS.GRANTED) {
-          throw new Error('Notification Permission Not Granted');
-        }
-      } catch (error) {
-        dispatch(setpermissionIsOpen(true));
-      }
+    const apply = (p: {notification: boolean; location: boolean}) => {
+      dispatch(setNotificationPermission(p.notification));
+      dispatch(setLocationPermission(p.location));
+      // Show the explanation (with a button to the phone's settings) until both are allowed.
+      dispatch(setpermissionIsOpen(!(p.notification && p.location)));
     };
 
-    handlePermissions();
+    const askThenCheck = async () => {
+      try {
+        if (needsNotificationPermission) {
+          await PermissionsAndroid.request(P.POST_NOTIFICATIONS);
+        }
+        await PermissionsAndroid.requestMultiple([
+          P.ACCESS_FINE_LOCATION,
+          P.ACCESS_COARSE_LOCATION,
+        ]);
+      } catch (error) {
+        // fall through to the check below
+      }
+      apply(await currentPermissions());
+    };
+
+    askThenCheck();
+
+    // When the agent comes back from the phone's settings, check again so the app
+    // carries on by itself instead of staying on this screen.
+    const sub = AppState.addEventListener('change', async state => {
+      if (state === 'active') {
+        apply(await currentPermissions());
+      }
+    });
+    return () => sub.remove();
   }, [dispatch]);
 
   return (
@@ -53,7 +74,7 @@ export function SplashScreen() {
           size={'xl'}
           fontStyle={'italic'}
           fontFamily={'Ubuntu'}>
-          Agent Apps
+          CléCheck Agent
         </Text>
       </Center>
     </View>
