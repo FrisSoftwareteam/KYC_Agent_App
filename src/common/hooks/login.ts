@@ -65,7 +65,10 @@ export const useLogin = () => {
     };
 
     try {
-      const loginResponse = await login({...payload}).unwrap();
+      const loginResponse = await login({
+        ...payload,
+        email: payload.email.trim().toLowerCase(),
+      }).unwrap();
       await dispatch(setUser({data: {...loginResponse.data}}));
       if (deviceToken) {
         await fcmToken({token: deviceToken});
