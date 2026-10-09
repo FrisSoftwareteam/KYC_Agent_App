@@ -27,10 +27,8 @@ export const useLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [payload, setPayload] = useState<TLoginRequest>({
-    // password: '',
-    // email: '',
-    password: 'password',
-    email: 'get.t.osin4me@gmail.com',
+    password: '',
+    email: '',
   });
 
   const handleChange = (e: string, key: string) => {
@@ -67,9 +65,14 @@ export const useLogin = () => {
     };
 
     try {
-      const loginResponse = await login({...payload}).unwrap();
+      const loginResponse = await login({
+        ...payload,
+        email: payload.email.trim().toLowerCase(),
+      }).unwrap();
       await dispatch(setUser({data: {...loginResponse.data}}));
-      await fcmToken({token: deviceToken});
+      if (deviceToken) {
+        await fcmToken({token: deviceToken});
+      }
       await syncLocation({...locationPayload});
       await dispatch(setStatus('online'));
       if (walkThroughSteps === 0) {

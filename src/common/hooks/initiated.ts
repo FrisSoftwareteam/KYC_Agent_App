@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import {useAppDispatch, useAppSelector} from './redux';
 import {ably} from '@/lib/ably';
 import {setAbly, setAblyModal} from '@/lib/ably/slice';
@@ -18,26 +18,46 @@ export const useInitiated = () => {
   const {isInternetReachable} = useNetInfo();
   const dispatch = useAppDispatch();
 
+  // The 60-second timer is created once, so it must read the latest values
+  // through a ref. Reading them directly would keep the values from the first
+  // render (no user, no location yet) and the location would never be sent.
+  const latest = useRef({
+    user,
+    status,
+    isInternetReachable,
+    locationPermission,
+    handleLocation,
+  });
+  latest.current = {
+    user,
+    status,
+    isInternetReachable,
+    locationPermission,
+    handleLocation,
+  };
+  const {location} = useAppSelector(state => state.ably);
+  const hasLocation = Boolean(location?.coords);
+
   useEffect(() => {
-    const timer = setInterval(async () => {
-      if (user?.id && isInternetReachable) {
-        if (locationPermission) {
-          handleLocation(status);
-        }
+    const timer = setInterval(() => {
+      const now = latest.current;
+      if (now.user?.id && now.isInternetReachable && now.locationPermission) {
+        now.handleLocation(now.status);
       }
     }, 60000);
     return () => {
       clearInterval(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Send the location straight away when the agent goes online or offline,
+  // when the first GPS fix arrives, and when the connection comes back.
   useEffect(() => {
     if (user?.id && isInternetReachable) {
       handleLocation(status);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [status, hasLocation, isInternetReachable, user?.id]);
 
   useEffect(() => {
     if (isInternetReachable) {
@@ -52,17 +72,18 @@ export const useInitiated = () => {
   }, []);
 
   useEffect(() => {
-    if (user && isInternetReachable) {
+    if (ably && user && isInternetReachable) {
       const channel: any = ably.channels.get(
         String(`firstCheckAgent-${user?.agentId}`),
       );
-      channel.subscribe('addressNotificationEvent', (message: any) => {
+      const onOffer = (message: any) => {
         dispatch(setAbly(message.data));
         dispatch(setAblyModal(true));
-      });
+      };
+      channel.subscribe('addressNotificationEvent', onOffer);
 
       return () => {
-        channel.unsubscribe(user?.agentId);
+        channel.unsubscribe('addressNotificationEvent', onOffer);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -77,3 +77,28 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+
+---
+
+# FirstCheck Agent App - building a release
+
+Official source: https://github.com/FrisSoftwareteam/KYC_Agent_App
+
+1. Copy `.env.example` to `.env` and fill in `ABLY_KEY` (subscribe-only key, starts `70A3og.`).
+   For staging builds use `API_URL=https://firstcheckapi-staging.firstregistrarsnigeria.com/v1/`
+   and the staging app's subscribe-only key (starts `Dcj6ig.`).
+2. `yarn install`
+3. Push notifications: replace `android/app/google-services.json` with the file from the
+   company Firebase project (the server's Firebase key must come from the same project).
+4. Release signing: put the release key at `android/app/agentApp.keystore` and set
+   `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` in the environment. Never commit the key.
+   Without it the build is signed with the public test key (testing only).
+5. Raise `versionCode` / `versionName` in `android/app/build.gradle` for every release.
+6. `cd android && ./gradlew assembleRelease` (APK) or `./gradlew bundleRelease` (Play Store).
+
+## App ID
+
+The Android app ID is `com.firstregistrars.firstcheckagent`. The Firebase file
+`android/app/google-services.json` must come from the company Firebase project with an
+Android app registered under this exact ID, otherwise the build stops with
+"No matching client found for package name".

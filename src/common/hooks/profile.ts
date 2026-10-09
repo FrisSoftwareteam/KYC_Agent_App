@@ -23,7 +23,7 @@ const options = {
 
 export const useProfile = () => {
   const {navigate} = useNavigation<TNavigation>();
-  const {data, refetch} = useProfileQuery();
+  const {data, refetch} = useProfileQuery('');
   const dispatch = useAppDispatch();
   const {handleLocation} = useLocation();
   const {status} = useAppSelector(state => state.auth);

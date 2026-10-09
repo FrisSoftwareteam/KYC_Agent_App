@@ -50,6 +50,21 @@ export type TProfile = {
       mustChangePassword: boolean;
       isEmailVerified: boolean;
     };
+    wallet?: {
+      outstanding: number;
+      withdrawable: number;
+      totalPaidOut: number;
+      formatted?: {
+        outstanding: string;
+        withdrawable: string;
+        totalPaidOut: string;
+      };
+    };
+    bank?: {
+      bankName?: string;
+      accountName?: string;
+      accountNumber?: string;
+    };
     partner: {
       _id: string;
       name: string;

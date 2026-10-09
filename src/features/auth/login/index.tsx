@@ -48,6 +48,10 @@ export function Login() {
             <Input size={'xl'}>
               <InputField
                 placeholder={'Enter your email address'}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                keyboardType="email-address"
                 placeholderTextColor={theme.colors.grey[300]}
                 onChangeText={e => handleChange(e, 'email')}
               />
@@ -66,6 +70,8 @@ export function Login() {
               <InputField
                 type={showPassword ? 'text' : 'password'}
                 placeholder={'Enter your password'}
+                autoCapitalize="none"
+                autoCorrect={false}
                 placeholderTextColor={theme.colors.grey[300]}
                 onChangeText={e => handleChange(e, 'password')}
               />
