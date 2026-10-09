@@ -1,4 +1,4 @@
-package com.agentapp
+package com.firstregistrars.firstcheckagent
 
 import android.app.Application
 import com.facebook.react.PackageList

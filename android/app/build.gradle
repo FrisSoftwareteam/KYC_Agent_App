@@ -75,9 +75,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.agentapp"
+    namespace "com.firstregistrars.firstcheckagent"
     defaultConfig {
-        applicationId "com.agentapp"
+        applicationId "com.firstregistrars.firstcheckagent"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2
