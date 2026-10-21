@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "354625230410",
-    "project_id": "tosin-app-001",
-    "storage_bucket": "tosin-app-001.appspot.com"
+    "project_number": "808604617221",
+    "project_id": "clecheck",
+    "storage_bucket": "clecheck.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:354625230410:android:b36afd028d2a3445aa78b3",
+        "mobilesdk_app_id": "1:808604617221:android:38ea88dab55a9bfb2d6a6c",
         "android_client_info": {
-          "package_name": "com.agentapp"
+          "package_name": "com.firstregistrars.firstcheckagent"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "354625230410-c9ir3bg8iqio4gpk0n1ab8plvg7uudpc.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDsi9R1ooQVPqyKq9pDQyPFFBSAzDmeG8s"
+          "current_key": "AIzaSyCipfYhghsC_vEfQr6Z9h4KxwrprWwrgew"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "354625230410-c9ir3bg8iqio4gpk0n1ab8plvg7uudpc.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

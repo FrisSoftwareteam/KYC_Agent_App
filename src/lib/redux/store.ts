@@ -4,11 +4,11 @@ import {AppState} from 'react-native';
 import {apiSlice} from './apislice';
 import {rootReducer} from './reducers';
 import {persistReducer, persistStore} from 'redux-persist';
-import {createRealmPersistStorage} from '../realm';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const persistConfig = {
   key: 'root',
-  storage: createRealmPersistStorage(),
+  storage: AsyncStorage,
   whitelist: ['auth', 'offline'],
 };
 
