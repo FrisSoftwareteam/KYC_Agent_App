@@ -43,7 +43,11 @@ export const useAbly = () => {
       onClose();
       sound.stop();
     } catch (error) {
+      // Close the offer either way (for example, another agent already took it).
       dispatch(setToast({description: error, type: 'error'}));
+      dispatch(setAblyModal(false));
+      onClose();
+      sound.stop();
     }
   };
 
@@ -60,7 +64,11 @@ export const useAbly = () => {
       sound.stop();
       onClose();
     } catch (error) {
+      // Close the offer either way (for example, another agent already took it).
       dispatch(setToast({description: error, type: 'error'}));
+      dispatch(setAblyModal(false));
+      onClose();
+      sound.stop();
     }
   };
 
@@ -70,7 +78,7 @@ export const useAbly = () => {
         dispatch(setAblyModal(false));
         onClose();
         sound.stop();
-      }, 20000);
+      }, 100000); // the server waits 2 minutes before offering the job to someone else
 
       return () => {
         clearTimeout(timer);

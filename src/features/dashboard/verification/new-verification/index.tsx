@@ -12,7 +12,8 @@ import {
   ScrollView,
 } from '@gluestack-ui/themed';
 import {X} from 'lucide-react-native';
-import React from 'react';
+import React, {useState} from 'react';
+import {formatDistance} from '@/utils/distance';
 import {useNewVerification} from '@/common/hooks/new-verification';
 import {DimensionValue, TouchableOpacity} from 'react-native';
 import {StepOne} from './step-one';
@@ -51,7 +52,14 @@ export function NewVerification() {
     SignatureRef,
     addressUpdateIsLoading,
     signature,
+    distance,
+    hasLocation,
+    maxDistance,
   } = useNewVerification();
+  // Stop the page scrolling while the agent draws a signature, so strokes are not lost.
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+  const far =
+    hasLocation && Number.isFinite(distance) && distance >= maxDistance;
 
   return (
     <View w={'$full'} h={'$full'} bg={theme.colors.primary.white}>
@@ -69,7 +77,10 @@ export function NewVerification() {
         borderBottomWidth={'$1'}
       />
       <SafeAreaView>
-        <ScrollView showsVerticalScrollIndicator={false} h={'$full'}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          h={'$full'}
+          scrollEnabled={scrollEnabled}>
           <Center w={'$full'} h={'$full'}>
             <View h={'$full'} w={'85%'} overflow={'hidden'} mt={'$5'}>
               <HStack alignItems={'center'} w={'$full'}>
@@ -114,8 +125,27 @@ export function NewVerification() {
                 </HStack>
               </HStack>
 
+              <View
+                mt={'$4'}
+                py={'$2'}
+                px={'$3'}
+                borderRadius={'$md'}
+                bg={!hasLocation || far ? '#FFF6E5' : '#ECFDF3'}>
+                <Text fontSize={'$sm'} color={theme.colors.grey.solid}>
+                  {!hasLocation
+                    ? 'Finding your location… keep location on.'
+                    : Number.isFinite(distance)
+                    ? far
+                      ? `You are ${formatDistance(
+                          distance,
+                        )} from the address pin. If this is the right building you can still submit; it will be marked for review.`
+                      : `You are ${formatDistance(distance)} from the address.`
+                    : 'Location found.'}
+                </Text>
+              </View>
+
               <VStack space={'4xl'} h={'$full'}>
-                <View mt={'$8'}>
+                <View mt={'$6'}>
                   {step === 1 && (
                     <StepOne payload={payload} handleChange={handleChange} />
                   )}
@@ -152,6 +182,8 @@ export function NewVerification() {
                       handleRedoSignature={handleRedoSignature}
                       handleUndoSignature={handleUndoSignature}
                       signature={signature}
+                      onDrawStart={() => setScrollEnabled(false)}
+                      onDrawEnd={() => setScrollEnabled(true)}
                     />
                   )}
                 </View>

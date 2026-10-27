@@ -16,11 +16,23 @@ import {
   VStack,
   View,
 } from '@gluestack-ui/themed';
-import {MapPin, X} from 'lucide-react-native';
+import {MapPin, Phone, X} from 'lucide-react-native';
 import React from 'react';
 import {Motion} from '@legendapp/motion';
-import {Easing, TouchableOpacity} from 'react-native';
+import {Easing, Linking, TouchableOpacity} from 'react-native';
 import {openGoogleMap} from '@/utils';
+
+// The candidate's phone may be a plain string or {countryCode, number}.
+const candidatePhone = (data: any): string => {
+  const p = data?.candidate?.phoneNumber;
+  if (!p) {
+    return '';
+  }
+  if (typeof p === 'string') {
+    return p;
+  }
+  return `${p.countryCode || ''}${p.number || ''}`;
+};
 
 type TSheet = {
   isOpen: boolean;
@@ -147,6 +159,35 @@ export function Sheet({isOpen, onClose, data, handleNewVerification}: TSheet) {
                     </HStack>
                   </Pressable>
                 </VStack>
+
+                {Boolean(candidatePhone(data)) && (
+                  <VStack space={'sm'}>
+                    <Text
+                      color={theme.colors.grey[200]}
+                      fontFamily={theme.fontFamily.regular}
+                      fontSize={'$xs'}>
+                      Candidate phone
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        Linking.openURL(`tel:${candidatePhone(data)}`)
+                      }>
+                      <HStack alignItems={'center'} gap={'$1'}>
+                        <Phone
+                          width={14}
+                          height={14}
+                          color={theme.colors.status.started}
+                        />
+                        <Text
+                          color={theme.colors.status.started}
+                          fontSize={'$md'}
+                          fontFamily={theme.fontFamily.regular}>
+                          Call {candidatePhone(data)}
+                        </Text>
+                      </HStack>
+                    </TouchableOpacity>
+                  </VStack>
+                )}
 
                 <VStack space={'sm'}>
                   <Text

@@ -83,6 +83,7 @@ export type TAddressInfo = {
   gatePresent: boolean;
   gateColor: string;
   closestLandmark: string;
+  audioUrl?: string;
 };
 
 export type TUpload = {

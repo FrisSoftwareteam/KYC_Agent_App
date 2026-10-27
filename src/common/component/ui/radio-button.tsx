@@ -5,11 +5,13 @@ import {PressableProps} from 'react-native';
 
 type TRadioButton = {
   value: string;
+  label?: string;
   payload: string | undefined;
 };
 
 export function RadioButton({
   value,
+  label,
   payload,
   ...props
 }: TRadioButton & PressableProps) {
@@ -50,7 +52,7 @@ export function RadioButton({
         fontSize={'$lg'}
         fontFamily={theme.fontFamily.medium}
         color={theme.colors.grey.solid}>
-        {value}
+        {label ?? value}
       </Text>
     </Pressable>
   );

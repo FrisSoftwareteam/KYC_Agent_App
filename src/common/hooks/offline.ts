@@ -59,8 +59,9 @@ export const useOffline = () => {
     );
     dispatch(
       setToast({
-        description: 'Task will be synced once there is coverage',
-        title: 'Congratulation 🤝',
+        description:
+          'No internet. The visit is saved on this phone and will be sent automatically when you are back online.',
+        title: 'Saved',
         type: 'success',
       }),
     );
@@ -74,121 +75,105 @@ export const useOffline = () => {
       }
       dispatch(setIsSyncing(true));
       const itemArray = Array.isArray(data) ? data : [data];
+      let failed = false;
       for (let item of itemArray) {
-        const image1 = new FormData();
-        image1.append('image', {
-          uri: item?.images[0]?.value,
-          name: 'image.jpg',
-          type: item?.images[0]?.type,
-        });
-
-        const image2 = new FormData();
-        image2.append('image', {
-          uri: item?.images[1]?.value,
-          name: 'image.jpg',
-          type: item?.images[1]?.type,
-        });
-
-        const image3 = new FormData();
-        image3.append('image', {
-          uri: item?.images[2]?.value,
-          name: 'image.jpg',
-          type: item?.images[2]?.type,
-        });
-
-        const signatoryData = new FormData();
-        signatoryData.append('image', {
-          uri: item?.signatoryPath,
-          name: 'signatory.jpg',
-          type: 'image/jpeg',
-        });
-
-        const audioData = new FormData();
-        audioData.append('audio', {
-          uri: item?.audio,
-          name: 'audio.mp4',
-          type: 'audio/mp4',
-        });
-        audioData.append('addressId', item?._id);
-        const submitPayload = {
-          address: item?._id,
-          status: item?.status,
-          position: item?.position,
+        const imageForm = (img?: {value: string; type: string}) => {
+          const form = new FormData();
+          form.append('image', {
+            uri: img?.value,
+            name: 'image.jpg',
+            type: img?.type || 'image/jpeg',
+          } as any);
+          return form;
         };
 
-        const uploadPromises = [
-          uploadImage(image1).unwrap(),
-          uploadImage(image2).unwrap(),
-          uploadImage(image3).unwrap(),
-        ];
-
-        if (item?.signatoryPath) {
-          uploadPromises.push(uploadSignature(signatoryData).unwrap());
-        }
-        if (item?.audio) {
-          uploadPromises.push(uploadAudio(audioData).unwrap());
-        }
-
         try {
-          const [image1Res, image2Res, image3Res, signatoryRes, audioRes] =
-            await Promise.all(uploadPromises);
+          // Uploads kept apart so links can never land in the wrong field.
+          const [imageResults, signatoryRes, audioRes] = await Promise.all([
+            Promise.all(
+              (item?.images || [])
+                .slice(0, 3)
+                .map((img: any) => uploadImage(imageForm(img)).unwrap()),
+            ),
+            item?.signatoryPath
+              ? uploadSignature(
+                  (() => {
+                    const form = new FormData();
+                    form.append('image', {
+                      uri: item?.signatoryPath,
+                      name: 'signatory.jpg',
+                      type: 'image/jpeg',
+                    } as any);
+                    return form;
+                  })(),
+                ).unwrap()
+              : Promise.resolve(undefined),
+            item?.audio
+              ? uploadAudio(
+                  (() => {
+                    const form = new FormData();
+                    form.append('audio', {
+                      uri: item?.audio,
+                      name: 'audio.mp4',
+                      type: 'audio/mp4',
+                    } as any);
+                    form.append('addressId', item?._id);
+                    return form;
+                  })(),
+                ).unwrap()
+              : Promise.resolve(undefined),
+          ]);
 
-          const addressPayload = {
+          await updateAddress({
             address: item?._id,
             signature: signatoryRes?.data?.url || item?.signature,
             notes: item?.notes,
-            images: [
-              image1Res?.data?.url,
-              image2Res?.data?.url,
-              image3Res?.data?.url,
-            ],
+            images: imageResults.map((res: any) => res?.data?.url),
             buildingType: item?.payload.buildingType,
             buildingColor: item?.payload.buildingColor,
-            gatePresent: Boolean(item?.payload.gatePresent === 'true'),
+            gatePresent:
+              String(item?.payload.gatePresent).toLowerCase() === 'true',
             gateColor: item?.payload.gateColor,
             closestLandmark: item?.payload.closestLandmark,
             audioUrl: audioRes?.data?.url || '',
-          };
+          }).unwrap();
 
-          const res = await updateAddress({...addressPayload}).unwrap();
+          await submitAddress({
+            address: item?._id,
+            status: item?.status,
+            position: item?.position,
+          }).unwrap();
 
-          if (res.data) {
-            await submitAddress({...submitPayload});
-            // dispatch(
-            //   setToast({
-            //     description: 'Offline data successfully uploaded',
-            //     title: 'Congratulation 🤝',
-            //     type: 'success',
-            //   }),
-            // );
-            await dispatch(
-              setUpdatedOfflineData({
-                data: item._id,
-                isInitialized: true,
-              }),
-            );
-          }
+          await dispatch(
+            setUpdatedOfflineData({
+              data: item._id,
+              isInitialized: true,
+            }),
+          );
         } catch (error) {
+          failed = true;
           dispatch(
             setToast({
-              description: 'Error uploading offline data',
+              title: 'Saved visit not sent yet',
+              description:
+                'A visit saved offline could not be sent. It will try again when your connection is better.',
               type: 'error',
             }),
           );
           break;
         }
       }
+      // Always close the "Syncing" box, even after a failure, so the app is never blocked.
+      dispatch(setIsSyncing(false));
+      if (!failed) {
+        clearCache();
+      }
     }
   };
 
   useEffect(() => {
     if (data.length === 0) {
-      setUpdatedOfflineData({
-        isInitialized: false,
-        data: '',
-      });
       dispatch(setIsSyncing(false));
-      clearCache();
     }
   }, [data, dispatch]);
 

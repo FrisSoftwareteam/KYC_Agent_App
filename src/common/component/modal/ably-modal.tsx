@@ -15,6 +15,7 @@ import {
   Divider,
   View,
 } from '@gluestack-ui/themed';
+import {formatDistance} from '@/utils/distance';
 import React from 'react';
 
 export function AblyModal() {
@@ -31,7 +32,7 @@ export function AblyModal() {
               fontWeight={'$bold'}
               textAlign={'center'}
               fontFamily={theme.fontFamily.medium}>
-              New verification?
+              New job offer
             </Text>
             {/* <Center
               position={'absolute'}
@@ -64,18 +65,54 @@ export function AblyModal() {
               color={theme.colors.grey[200]}
               fontSize={'$md'}>
               Address:{' '}
-              <Text color={theme.colors.grey.solid}>{data?.address}</Text>
-            </Text>
-            <Text
-              fontFamily={theme.fontFamily.medium}
-              color={theme.colors.grey[200]}
-              fontSize={'$md'}
-              isTruncated={true}>
-              Distance:{' '}
               <Text color={theme.colors.grey.solid}>
-                {data?.distance || 0}m away
+                {typeof data?.address === 'string'
+                  ? data?.address
+                  : (data?.address as any)?.formatAddress}
               </Text>
             </Text>
+            {Boolean(data?.landmark) && (
+              <Text
+                fontFamily={theme.fontFamily.medium}
+                color={theme.colors.grey[200]}
+                fontSize={'$md'}>
+                Landmark:{' '}
+                <Text color={theme.colors.grey.solid}>{data?.landmark}</Text>
+              </Text>
+            )}
+            {Boolean(formatDistance(data?.distance)) && (
+              <Text
+                fontFamily={theme.fontFamily.medium}
+                color={theme.colors.grey[200]}
+                fontSize={'$md'}>
+                Distance:{' '}
+                <Text color={theme.colors.grey.solid}>
+                  {formatDistance(data?.distance)} away
+                </Text>
+              </Text>
+            )}
+            {Number(data?.price) > 0 && (
+              <Text
+                fontFamily={theme.fontFamily.medium}
+                color={theme.colors.grey[200]}
+                fontSize={'$md'}>
+                You earn:{' '}
+                <Text color={theme.colors.grey.solid}>
+                  ₦{Number(data?.price).toLocaleString()}
+                </Text>
+              </Text>
+            )}
+            {Boolean(data?.turnarroundTime) && (
+              <Text
+                fontFamily={theme.fontFamily.medium}
+                color={theme.colors.grey[200]}
+                fontSize={'$md'}>
+                Complete within:{' '}
+                <Text color={theme.colors.grey.solid}>
+                  {data?.turnarroundTime}
+                </Text>
+              </Text>
+            )}
           </VStack>
         </AlertDialogBody>
         <Divider my={'$4'} />

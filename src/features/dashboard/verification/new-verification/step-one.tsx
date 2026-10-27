@@ -13,6 +13,7 @@ import {
   SelectDragIndicatorWrapper,
   SelectIcon,
   SelectInput,
+  SelectScrollView,
   SelectItem,
   SelectPortal,
   SelectTrigger,
@@ -74,7 +75,7 @@ export function StepOne({payload, handleChange}: TQuestion) {
         )}
         {payload.buildingColor && (
           <CustomInput
-            label={'What is the closet landmark to the building?'}
+            label={'What is the closest landmark to the building?'}
             payload={payload.closestLandmark}
             onPress={(e: any) => handleChange(e, 'closestLandmark')}
           />
@@ -134,7 +135,7 @@ function CustomSelect({label, data, payload, onPress}: any) {
 
       <Select onValueChange={onPress} defaultValue={payload}>
         <SelectTrigger variant="outline" size={'xl'}>
-          <SelectInput placeholder={'--Select a reason'} />
+          <SelectInput placeholder={'Select building type'} />
           <View mr={'$3'} mt={'$2'}>
             <SelectIcon>
               <Icon as={ChevronDownIcon} />
@@ -147,9 +148,15 @@ function CustomSelect({label, data, payload, onPress}: any) {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {data.map((item: any) => (
-              <SelectItem label={item.value} value={item.value} key={item.id} />
-            ))}
+            <SelectScrollView>
+              {data.map((item: any) => (
+                <SelectItem
+                  label={item.value}
+                  value={item.value}
+                  key={item.id}
+                />
+              ))}
+            </SelectScrollView>
           </SelectContent>
         </SelectPortal>
       </Select>
@@ -172,6 +179,7 @@ function CustomRadio({label, data, payload, onPress}: any) {
         {data.map((item: any) => (
           <RadioButton
             value={item.value}
+            label={item.label}
             key={item.id}
             payload={payload}
             onPress={() => onPress(item.value, 'gatePresent')}

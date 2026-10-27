@@ -1,7 +1,7 @@
 export const verificationState = [
   {
     id: 1,
-    name: 'Pending Verifcation',
+    name: 'Pending',
     no_data: 'You have no pending verifications',
     value: 'accepted',
   },

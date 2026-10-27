@@ -18,11 +18,12 @@ import {SignatureViewRef} from 'react-native-signature-canvas';
 import {convertBase64ToFile, formatFilePath} from '@/utils/base64-to-file';
 import {setToast} from '../component/toast/slice';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
-import {PermissionsAndroid} from 'react-native';
+import {Alert, PermissionsAndroid} from 'react-native';
 import {Platform} from 'react-native';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {useOffline} from './offline';
 import {useLocation} from './location';
+import {formatDistance} from '@/utils/distance';
 import Config from 'react-native-config';
 
 const MAX_DISTANCE_METRES =
@@ -47,7 +48,7 @@ const options = {
   },
   maxWidth: 800, // Android only
   maxHeight: 600, // Android only
-  quality: 80, // Android only
+  quality: 0.8, // 0 to 1 (80 was ignored, so full-size photos were uploaded)
   allowsEditing: true, // iOS only
   // includeBase64: true,
 };
@@ -136,23 +137,53 @@ export const useNewVerification = () => {
         long: Number(singleData?.position.longitude),
       };
 
-  const distance = distanceBetweenPoints(
-    distanceData.lat,
-    distanceData.long,
-    'm',
-  );
+  const hasLocation =
+    Number.isFinite(Number(location?.coords?.latitude)) &&
+    Number.isFinite(Number(location?.coords?.longitude));
 
-  const handleNext = async (value?: string) => {
+  const distance = hasLocation
+    ? distanceBetweenPoints(distanceData.lat, distanceData.long, 'm')
+    : NaN;
+
+  // Ask before submitting a visit that is far from the address pin. The pin is a guess
+  // from the typed address and is often wrong, so the agent may submit; the visit is
+  // then flagged for review on the dashboard instead of being blocked.
+  const confirmFarAway = (metres: number) =>
+    new Promise<boolean>(resolve => {
+      Alert.alert(
+        'Far from the address pin',
+        `You are about ${formatDistance(
+          metres,
+        )} from where the map places this address. ` +
+          'If you are at the right building, you can still submit; the visit will be marked for review.',
+        [
+          {text: 'Cancel', style: 'cancel', onPress: () => resolve(false)},
+          {text: 'Submit anyway', onPress: () => resolve(true)},
+        ],
+        {cancelable: true, onDismiss: () => resolve(false)},
+      );
+    });
+
+  const handleNext = async (value?: string, reason?: string) => {
     if (step === 4) {
-      if (distance >= MAX_DISTANCE_METRES) {
+      if (!hasLocation) {
         return dispatch(
           setToast({
-            description: 'Stay within the range of 0 to 100m to the address',
-            title: 'Distance info',
-            type: 'default',
+            title: 'Waiting for your location',
+            description:
+              'Turn on location, step outside for a moment, then press Submit again.',
+            type: 'error',
           }),
         );
       }
+
+      if (Number.isFinite(distance) && distance >= MAX_DISTANCE_METRES) {
+        const ok = await confirmFarAway(distance);
+        if (!ok) {
+          return;
+        }
+      }
+
       const signatoryPath = await convertBase64ToFile(confirmSignature).then(
         filePath => {
           return filePath;
@@ -160,12 +191,15 @@ export const useNewVerification = () => {
       );
 
       const audioPath = formatFilePath(audio);
+      const allNotes = reason
+        ? [`Reason not verified: ${reason}`, ...Object.values(notes)]
+        : Object.values(notes);
 
       if (!isInternetReachable) {
         return handleSyncData({
           payload: payload,
           images: images,
-          notes: Object.values(notes),
+          notes: allNotes,
           signatoryPath: signatoryPath,
           signature: signature,
           audio: audioPath,
@@ -178,98 +212,91 @@ export const useNewVerification = () => {
         });
       }
 
-      const image1 = new FormData();
-      image1.append('image', {
-        uri: images[0]?.value,
-        name: 'image.jpg',
-        type: images[0]?.type,
-      });
+      const addressId = (data?.data?._id || navigateData) as string;
 
-      const image2 = new FormData();
-      image2.append('image', {
-        uri: images[1]?.value,
-        name: 'image.jpg',
-        type: images[1]?.type,
-      });
-
-      const image3 = new FormData();
-      image3.append('image', {
-        uri: images[2]?.value,
-        name: 'image.jpg',
-        type: images[2]?.type,
-      });
-
-      const signatoryData = new FormData();
-      signatoryData.append('image', {
-        uri: signatoryPath,
-        name: 'signatory.jpg',
-        type: 'image/jpeg',
-      });
-
-      const audioData = new FormData();
-      audioData.append('audio', {
-        uri: audioPath,
-        name: 'audio.mp4',
-        type: 'audio/mp4',
-      });
-      audioData.append('addressId', data?.data?._id);
-
-      const submitPayload = {
-        address: data?.data?._id as string,
-        status: value as string,
-        position: {
-          latitude: location?.coords?.latitude as number,
-          longitude: location?.coords?.longitude as number,
-        },
+      const imageForm = (img?: {value: string; type: string}) => {
+        const form = new FormData();
+        form.append('image', {
+          uri: img?.value,
+          name: 'image.jpg',
+          type: img?.type || 'image/jpeg',
+        } as any);
+        return form;
       };
 
-      const uploadPromises = [
-        uploadImage(image1).unwrap(),
-        uploadImage(image2).unwrap(),
-        uploadImage(image3).unwrap(),
-      ];
-
-      if (signatoryPath) {
-        uploadPromises.push(uploadSignature(signatoryData).unwrap());
-      }
-      if (audioPath) {
-        uploadPromises.push(uploadAudio(audioData).unwrap());
-      }
-
       try {
-        const [image1Res, image2Res, image3Res, signatoryRes, audioRes] =
-          await Promise.all(uploadPromises);
+        // Each upload is kept apart, so a missing signature or voice note can
+        // never shift another file's link into the wrong field.
+        const [imageResults, signatoryRes, audioRes] = await Promise.all([
+          Promise.all(
+            images.slice(0, 3).map(img => uploadImage(imageForm(img)).unwrap()),
+          ),
+          signatoryPath
+            ? uploadSignature(
+                (() => {
+                  const form = new FormData();
+                  form.append('image', {
+                    uri: signatoryPath,
+                    name: 'signatory.jpg',
+                    type: 'image/jpeg',
+                  } as any);
+                  return form;
+                })(),
+              ).unwrap()
+            : Promise.resolve(undefined),
+          audioPath
+            ? uploadAudio(
+                (() => {
+                  const form = new FormData();
+                  form.append('audio', {
+                    uri: audioPath,
+                    name: 'audio.mp4',
+                    type: 'audio/mp4',
+                  } as any);
+                  form.append('addressId', addressId);
+                  return form;
+                })(),
+              ).unwrap()
+            : Promise.resolve(undefined),
+        ]);
+
         const addressPayload = {
-          address: data?.data?._id as string,
+          address: addressId,
           signature: signatoryRes?.data?.url || (signature as string),
-          notes: Object.values(notes),
-          images: [
-            image1Res?.data?.url,
-            image2Res?.data?.url,
-            image3Res?.data?.url,
-          ],
+          notes: allNotes,
+          images: imageResults.map(res => res?.data?.url),
           buildingType: payload.buildingType,
           buildingColor: payload.buildingColor,
-          gatePresent: Boolean(payload.gatePresent.toLowerCase() === 'true'),
+          gatePresent: String(payload.gatePresent).toLowerCase() === 'true',
           gateColor: payload.gateColor,
           closestLandmark: payload.closestLandmark,
           audioUrl: audioRes?.data?.url || '',
         };
-        const res = await updateAddress({...addressPayload}).unwrap();
-        if (res.data) {
-          await submitAddress({...submitPayload});
-          dispatch(
-            setToast({
-              description: res.data,
-              title: 'Congratulation 🤝',
-              type: 'success',
-            }),
-          );
-          return navigate(ERoutes.VERIFICATION);
-        }
+        await updateAddress({...addressPayload}).unwrap();
+        // Only report success once the server has accepted the submission.
+        await submitAddress({
+          address: addressId,
+          status: value as string,
+          position: {
+            latitude: location?.coords?.latitude as number,
+            longitude: location?.coords?.longitude as number,
+          },
+        }).unwrap();
+        dispatch(
+          setToast({
+            description:
+              value === 'failed'
+                ? 'Submitted as not verified.'
+                : 'Verification submitted.',
+            title: 'Done',
+            type: 'success',
+          }),
+        );
+        return navigate(ERoutes.VERIFICATION);
       } catch (error) {
         dispatch(
           setToast({
+            title: 'Not submitted. Please try again.',
             description: error,
             type: 'error',
           }),
@@ -299,7 +326,20 @@ export const useNewVerification = () => {
 
   const handleImageUpload = async (value: string) => {
     const result: any = await launchCamera(options as any);
-    if (!result.cancelled) {
+    if (result?.errorCode) {
+      dispatch(
+        setToast({
+          title: 'Camera not available',
+          description:
+            result.errorCode === 'permission'
+              ? 'Allow camera access for CleCheck Agent in your phone settings.'
+              : result.errorMessage || 'Please try again.',
+          type: 'error',
+        }),
+      );
+      return;
+    }
+    if (!result?.didCancel && result?.assets?.length) {
       setImages((prev: any) => {
         const index = prev.findIndex((item: any) => item.name === value);
 
@@ -503,6 +543,9 @@ export const useNewVerification = () => {
     onPausePlay,
     handleRedoSignature,
     handleUndoSignature,
+    distance,
+    hasLocation,
+    maxDistance: MAX_DISTANCE_METRES,
     playTime,
     play,
     recorded,

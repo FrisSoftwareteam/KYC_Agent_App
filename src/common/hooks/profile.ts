@@ -17,7 +17,7 @@ const options = {
   },
   maxWidth: 800, // Android only
   maxHeight: 600, // Android only
-  quality: 80, // Android only
+  quality: 0.8, // 0 to 1
   allowsEditing: true, // iOS only
 };
 
@@ -33,7 +33,7 @@ export const useProfile = () => {
   const handleProileUpdate = async () => {
     const result: any = await launchImageLibrary(options as any);
 
-    if (!result.cancelled) {
+    if (!result?.didCancel && result?.assets?.length) {
       setPayload(result);
     }
   };

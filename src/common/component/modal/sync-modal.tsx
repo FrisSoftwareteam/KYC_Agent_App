@@ -27,7 +27,7 @@ export function SyncModal() {
               fontWeight={'$bold'}
               textAlign={'center'}
               fontFamily={theme.fontFamily.medium}>
-              Syncing offline verification!!!
+              Sending saved visits
             </Text>
           </View>
         </AlertDialogHeader>

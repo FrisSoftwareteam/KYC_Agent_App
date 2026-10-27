@@ -68,7 +68,12 @@ export const useInitiated = () => {
 
   useEffect(() => {
     requestUserPermission();
-    notificationListener();
+    const unsubscribe = notificationListener(offer => {
+      dispatch(setAbly(offer));
+      dispatch(setAblyModal(true));
+    });
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

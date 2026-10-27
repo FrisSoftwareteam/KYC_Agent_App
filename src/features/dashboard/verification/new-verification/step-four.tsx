@@ -22,6 +22,8 @@ export function StepFour({
   handleRedoSignature,
   handleUndoSignature,
   handleChange,
+  onDrawStart,
+  onDrawEnd,
 }: any) {
   const [state, setState] = useState('Draw');
   return (
@@ -102,7 +104,11 @@ export function StepFour({
               borderColor={theme.colors.primary.DEFAULT}>
               <SignatureScreen
                 ref={SignatureRef}
-                onEnd={handleEnd}
+                onBegin={onDrawStart}
+                onEnd={() => {
+                  onDrawEnd?.();
+                  handleEnd();
+                }}
                 onOK={handleSignature}
                 descriptionText=""
                 backgroundColor={'#F7F7FF'}

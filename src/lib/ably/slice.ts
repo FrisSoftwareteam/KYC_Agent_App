@@ -11,6 +11,9 @@ type State = {
     };
     verificationId: string;
     addressId: string;
+    landmark?: string;
+    price?: number | string;
+    turnarroundTime?: string;
   };
 
   location: null | {
