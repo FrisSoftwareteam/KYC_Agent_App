@@ -15,7 +15,10 @@ export const useInitiated = () => {
   const {locationPermission} = useAppSelector(state => state.ably);
   const {handleLocation} = useLocation();
   const {handleUploadSyncData} = useOffline();
-  const {isInternetReachable} = useNetInfo();
+  // The reachability check is often unknown (null) or wrong on slow networks; only a
+  // definite "no internet" should stop the app sending its location and listening for jobs.
+  const {isInternetReachable: reachable} = useNetInfo();
+  const isInternetReachable = reachable !== false;
   const dispatch = useAppDispatch();
   const {isOpen: offerOpen, data: offerData} = useAppSelector(
     state => state.ably,
