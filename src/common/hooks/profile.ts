@@ -1,3 +1,4 @@
+import {safeRefetch} from '@/utils/safe-refetch';
 import {useProfileQuery, useUploadProfilePictureMutation} from '@/apis/auth';
 import {useNavigation} from '@react-navigation/native';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -54,7 +55,7 @@ export const useProfile = () => {
             type: 'success',
           }),
         );
-        refetch();
+        safeRefetch(refetch);
         setPayload(null);
       }
     }

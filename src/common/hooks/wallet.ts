@@ -1,3 +1,4 @@
+import {safeRefetch} from '@/utils/safe-refetch';
 import {useMemo, useState} from 'react';
 import {Alert} from 'react-native';
 import {useProfileQuery} from '@/apis/auth';
@@ -173,8 +174,7 @@ export const useWallet = () => {
   };
 
   const refresh = () => {
-    refetch();
-    refetchTx();
+    safeRefetch(refetch, refetchTx);
   };
 
   return {

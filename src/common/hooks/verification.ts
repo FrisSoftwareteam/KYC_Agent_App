@@ -1,3 +1,4 @@
+import {safeRefetch} from '@/utils/safe-refetch';
 import {verificationState} from '@/features/dashboard/verification/data';
 import {useEffect, useState} from 'react';
 import {useDisclosure} from './useDisclosure';
@@ -96,7 +97,7 @@ export const useVerification = () => {
 
   useEffect(() => {
     if (refreshing) {
-      refetch();
+      safeRefetch(refetch);
     }
   }, [refetch, refreshing]);
 

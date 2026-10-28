@@ -1,3 +1,4 @@
+import {safeRefetch} from '@/utils/safe-refetch';
 import {dateData} from '@/features/dashboard/home/data';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
@@ -44,8 +45,7 @@ export const useHome = () => {
 
   useEffect(() => {
     if (refreshing) {
-      refetch();
-      trendingRefectch();
+      safeRefetch(refetch, trendingRefectch);
     }
   }, [refetch, refreshing, trendingRefectch]);
 
