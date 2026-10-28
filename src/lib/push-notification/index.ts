@@ -69,13 +69,19 @@ export const notificationListener = (onOffer?: (offer: TOffer) => void) => {
   };
 
   const unsubscribe = messaging().onNotificationOpenedApp(handle);
+  // With the app open, show the offer from the push notification too. This is a second
+  // way in, so offers still arrive when the live connection (Ably) is down.
+  const unsubscribeForeground = messaging().onMessage(handle);
 
   messaging()
     .getInitialNotification()
     .then(handle)
     .catch(() => undefined);
 
-  return unsubscribe;
+  return () => {
+    unsubscribe();
+    unsubscribeForeground();
+  };
 };
 
 // Returns the device's push token, or null if it cannot be obtained.

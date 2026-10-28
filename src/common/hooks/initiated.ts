@@ -17,6 +17,24 @@ export const useInitiated = () => {
   const {handleUploadSyncData} = useOffline();
   const {isInternetReachable} = useNetInfo();
   const dispatch = useAppDispatch();
+  const {isOpen: offerOpen, data: offerData} = useAppSelector(
+    state => state.ably,
+  );
+  const openOffer = useRef({offerOpen, offerData});
+  openOffer.current = {offerOpen, offerData};
+
+  // The same offer can arrive twice (live message and push notification): show it once.
+  const showOffer = (offer: any) => {
+    const now = openOffer.current;
+    if (
+      now.offerOpen &&
+      String(now.offerData?.addressId) === String(offer?.addressId)
+    ) {
+      return;
+    }
+    dispatch(setAbly(offer));
+    dispatch(setAblyModal(true));
+  };
 
   // The 60-second timer is created once, so it must read the latest values
   // through a ref. Reading them directly would keep the values from the first
@@ -69,8 +87,7 @@ export const useInitiated = () => {
   useEffect(() => {
     requestUserPermission();
     const unsubscribe = notificationListener(offer => {
-      dispatch(setAbly(offer));
-      dispatch(setAblyModal(true));
+      showOffer(offer);
     });
     return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,8 +99,7 @@ export const useInitiated = () => {
         String(`firstCheckAgent-${user?.agentId}`),
       );
       const onOffer = (message: any) => {
-        dispatch(setAbly(message.data));
-        dispatch(setAblyModal(true));
+        showOffer(message.data);
       };
       channel.subscribe('addressNotificationEvent', onOffer);
 
