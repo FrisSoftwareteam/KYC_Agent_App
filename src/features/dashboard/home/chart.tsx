@@ -1,63 +1,53 @@
-import BadgeLogo from '@/assets/svgs/badge';
 import {theme} from '@/providers/theme-provider';
 import {HStack, Text, VStack} from '@gluestack-ui/themed';
+import {CheckCircle2, Clock3, XCircle} from 'lucide-react-native';
 import React from 'react';
 
+function Stat({icon, value, label, bg, color}: any) {
+  return (
+    <VStack
+      flex={1}
+      bg={bg}
+      p={'$3'}
+      borderRadius={'$xl'}
+      space={'xs'}
+      alignItems={'flex-start'}>
+      {icon}
+      <Text fontFamily={theme.fontFamily.bold} fontSize={'$2xl'} color={color}>
+        {value || 0}
+      </Text>
+      <Text fontSize={'$xs'} color={theme.colors.grey.solid}>
+        {label}
+      </Text>
+    </VStack>
+  );
+}
+
+// The agent's numbers for the chosen period, side by side.
 export function Chart({data}: any) {
   return (
-    <VStack space={'md'} borderColor={'#F7F7FF'} borderWidth={'$2'} p={'$4'}>
-      <HStack justifyContent={'space-between'}>
-        <VStack bg={'#F5FFFB'} w={'48%'} h={'$24'} p={'$3'} space={'sm'}>
-          <BadgeLogo color={theme.colors.status.success} />
-          <Text
-            fontFamily={theme.fontFamily.medium}
-            fontWeight={'meduim'}
-            fontSize={'$md'}
-            color={'#333333'}>
-            {data?.totalCompleted || 0}
-          </Text>
-          <Text
-            fontFamily={theme.fontFamily.regular}
-            fontSize={'$sm'}
-            color={'#333333'}>
-            Verified
-          </Text>
-        </VStack>
-
-        <VStack bg={'#FFF5F5'} w={'48%'} h={'$24'} p={'$3'} space={'sm'}>
-          <BadgeLogo color={'#CC707B'} />
-          <Text
-            fontFamily={theme.fontFamily.medium}
-            fontWeight={'bold'}
-            fontSize={'$md'}
-            color={'#333333'}>
-            {data?.totalFailed || 0}
-          </Text>
-          <Text
-            fontFamily={theme.fontFamily.regular}
-            fontSize={'$sm'}
-            color={'#333333'}>
-            Failed
-          </Text>
-        </VStack>
-      </HStack>
-
-      <VStack bg={'#F0F9FF'} h={'$24'} p={'$3'} space={'sm'}>
-        <BadgeLogo color={theme.colors.status.started} />
-        <Text
-          fontFamily={theme.fontFamily.medium}
-          fontWeight={'meduim'}
-          fontSize={'$md'}
-          color={'#333333'}>
-          {data?.totalInprogress || 0}
-        </Text>
-        <Text
-          fontFamily={theme.fontFamily.regular}
-          fontSize={'$sm'}
-          color={'#333333'}>
-          In Progress
-        </Text>
-      </VStack>
-    </VStack>
+    <HStack space={'sm'} mt={'$3'}>
+      <Stat
+        icon={<Clock3 width={18} height={18} color={'#3B6FE0'} />}
+        value={data?.totalInprogress}
+        label={'In progress'}
+        bg={'#EEF4FF'}
+        color={'#1E3A8A'}
+      />
+      <Stat
+        icon={<CheckCircle2 width={18} height={18} color={'#00A884'} />}
+        value={data?.totalCompleted}
+        label={'Verified'}
+        bg={'#E8FBF4'}
+        color={'#05624F'}
+      />
+      <Stat
+        icon={<XCircle width={18} height={18} color={'#D0021B'} />}
+        value={data?.totalFailed}
+        label={'Not verified'}
+        bg={'#FFF1F2'}
+        color={'#9F1239'}
+      />
+    </HStack>
   );
 }

@@ -4,6 +4,7 @@ import {
   FlatList,
   HStack,
   Icon,
+  Pressable,
   RefreshControl,
   SafeAreaView,
   Select,
@@ -24,10 +25,10 @@ import React from 'react';
 import {Header} from './header';
 import {theme} from '@/providers/theme-provider';
 import {Chart} from './chart';
-import {Separator} from '@/common/component/ui/separator';
 import {VerificationTable} from '@/common/component/table';
 import {useHome} from '@/common/hooks/home';
 import {dateData} from './data';
+import {ERoutes} from '@/common/enum/routes';
 
 export function Home() {
   const {
@@ -49,8 +50,8 @@ export function Home() {
     <View w={'$full'} h={'$full'} bg={theme.colors.primary.white}>
       <StatusBar
         animated={true}
-        backgroundColor={'#FFFFFF'}
-        barStyle={'dark-content'}
+        backgroundColor={'#0B2A5B'}
+        barStyle={'light-content'}
       />
       {/* <ApiLoading isLoading={isLoading} /> */}
       <SafeAreaView>
@@ -73,7 +74,7 @@ export function Home() {
                       fontFamily={theme.fontFamily.medium}
                       fontSize={'$sm'}
                       color={theme.colors.primary.DEFAULT}>
-                      VERIFICATIONS
+                      YOUR WORK
                     </Text>
                     <Select w={99} onValueChange={e => setFilter(e)}>
                       <SelectTrigger size={'xl'} borderWidth={'$0'}>
@@ -121,26 +122,28 @@ export function Home() {
                       fontFamily={theme.fontFamily.medium}
                       fontSize={'$sm'}
                       color={theme.colors.primary.DEFAULT}>
-                      RECENT VERIFICATIONS
+                      RECENT JOBS
                     </Text>
-                    <Text
-                      fontFamily={theme.fontFamily.bold}
-                      fontSize={'$sm'}
-                      fontWeight={'$medium'}
-                      color={theme.colors.primary.DEFAULT}>
-                      View all
-                    </Text>
+                    <Pressable onPress={() => navigate(ERoutes.VERIFICATION)}>
+                      <Text
+                        fontFamily={theme.fontFamily.bold}
+                        fontSize={'$sm'}
+                        fontWeight={'$medium'}
+                        color={theme.colors.primary.DEFAULT}>
+                        View all
+                      </Text>
+                    </Pressable>
                   </HStack>
                 </View>
               }
               ListEmptyComponent={
-                <Center mt={'$32'}>
+                <Center mt={'$16'}>
                   <Text
                     fontFamily={theme.fontFamily.bold}
                     color={theme.colors.grey.solid}
                     fontWeight={'$medium'}
                     fontSize={'$lg'}>
-                    Nothing to show
+                    No jobs yet
                   </Text>
                   <Text
                     fontFamily={theme.fontFamily.regular}
@@ -148,11 +151,10 @@ export function Home() {
                     fontSize={'$sm'}
                     color={theme.colors.grey[200]}
                     mt={'$3'}>
-                    Your recent verifications will show up here
+                    Stay online and new job offers will ring on your phone
                   </Text>
                 </Center>
               }
-              ItemSeparatorComponent={Separator}
               ListFooterComponent={<View h={'$32'} />}
               data={trendingData}
               renderItem={({item}) => (

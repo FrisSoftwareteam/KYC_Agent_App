@@ -131,7 +131,7 @@ export function Profile() {
                 mt={'$4'}
                 pt={'$8'}
                 pb={'$5'}>
-                <Text>Wallet</Text>
+                <Text>Earnings</Text>
                 <HStack alignItems={'center'} space={'sm'}>
                   <Text
                     color={theme.colors.status.success}

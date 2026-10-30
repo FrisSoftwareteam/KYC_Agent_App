@@ -7,6 +7,7 @@ import {
   ButtonSpinner,
   ButtonText,
   Center,
+  HStack,
   Input,
   InputField,
   InputIcon,
@@ -17,11 +18,13 @@ import {
 import {EyeIcon, EyeOffIcon} from 'lucide-react-native';
 import React from 'react';
 import {ForgetPasswordModal} from './forget-password-modal';
-import {TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity} from 'react-native';
+import clecheckLogo from '@/assets/images/brand/clecheck.png';
+import frLogo from '@/assets/images/brand/first-registrars.png';
 
 export function Login() {
   const {
-    // navigate,
+    payload,
     showPassword,
     isLoading,
     isOpen,
@@ -33,10 +36,27 @@ export function Login() {
   } = useLogin();
   return (
     <AuthLayout
-      title={'Login to your account'}
-      subtitle={' Enter your details to login to your account'}>
+      title={'Welcome back'}
+      subtitle={'Sign in to receive and complete verification jobs'}>
       <Center bg={theme.colors.primary.white}>
-        <VStack space={'4xl'} w={'90%'} h={'$full'} pt={'$10'}>
+        <VStack space={'3xl'} w={'90%'} h={'$full'} pt={'$8'}>
+          <Center>
+            <Image
+              source={clecheckLogo}
+              style={{width: 120, height: 57, borderRadius: 10}}
+              resizeMode={'contain'}
+            />
+            <HStack space={'xs'} alignItems={'center'} mt={'$2'}>
+              <Text fontSize={'$xs'} color={theme.colors.grey[200]}>
+                Powered by
+              </Text>
+              <Image
+                source={frLogo}
+                style={{width: 92, height: 32}}
+                resizeMode={'contain'}
+              />
+            </HStack>
+          </Center>
           <VStack space={'sm'}>
             <Text
               fontSize={'$sm'}
@@ -52,6 +72,7 @@ export function Login() {
                 autoCorrect={false}
                 autoComplete="email"
                 keyboardType="email-address"
+                returnKeyType="next"
                 placeholderTextColor={theme.colors.grey[300]}
                 onChangeText={e => handleChange(e, 'email')}
               />
@@ -70,6 +91,8 @@ export function Login() {
               <InputField
                 type={showPassword ? 'text' : 'password'}
                 placeholder={'Enter your password'}
+                returnKeyType="go"
+                onSubmitEditing={handleSubmit}
                 autoCapitalize="none"
                 autoCorrect={false}
                 placeholderTextColor={theme.colors.grey[300]}
@@ -89,7 +112,7 @@ export function Login() {
                 fontWeight={'$medium'}
                 fontFamily={theme.fontFamily.bold}
                 color={theme.colors.primary.DEFAULT}>
-                Forget Password?
+                Forgot password?
               </Text>
             </TouchableOpacity>
           </VStack>
@@ -99,21 +122,18 @@ export function Login() {
               bg={theme.colors.primary.DEFAULT}
               size={'lg'}
               onPress={handleSubmit}
-              isDisabled={isLoading}>
-              <ButtonText>Login</ButtonText>
+              isDisabled={
+                isLoading || !payload.email.trim() || !payload.password
+              }>
+              <ButtonText>Sign in</ButtonText>
               {isLoading && <ButtonSpinner ml="$1" />}
             </Button>
             <Text
               textAlign={'center'}
               fontFamily={theme.fontFamily.medium}
               color={theme.colors.grey.solid}>
-              Don’t have an account?{' '}
-              <Text
-                color={theme.colors.primary.DEFAULT}
-                // onPress={() => navigate(ERoutes.SIGN_UP)}
-              >
-                Create account
-              </Text>
+              New agent? Ask your partner to add you, then sign in with the
+              details they send you.
             </Text>
           </VStack>
         </VStack>

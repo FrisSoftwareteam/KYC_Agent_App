@@ -17,8 +17,7 @@ import {
   VStack,
   Image,
 } from '@gluestack-ui/themed';
-import React from 'react';
-import {Separator} from '@/common/component/ui/separator';
+import React, {useMemo, useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {verificationState} from './data';
 import {VerificationTable} from '@/common/component/table';
@@ -41,6 +40,26 @@ export default function Verification() {
     handleNewVerification,
     handleLimit,
   } = useVerification();
+  // The search box filters the jobs on screen by name, address or type.
+  const [query, setQuery] = useState('');
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      return data;
+    }
+    return (data || []).filter((item: any) =>
+      [
+        item?.candidate?.firstName,
+        item?.candidate?.lastName,
+        item?.formatAddress,
+        item?.category,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(q),
+    );
+  }, [data, query]);
 
   return (
     <View w={'$full'} h={'$full'} bg={theme.colors.primary.white}>
@@ -62,7 +81,7 @@ export default function Verification() {
             fontFamily={theme.fontFamily.bold}
             fontWeight={'$medium'}
             fontSize={'$md'}>
-            Verifications
+            My jobs
           </Text>
         </Center>
         <Center w={'$full'} h={'auto'}>
@@ -74,10 +93,15 @@ export default function Verification() {
                     <InputSlot pl="$3">
                       <InputIcon as={SearchIcon} />
                     </InputSlot>
-                    <InputField placeholder="Search names, addresses, verification type" />
+                    <InputField
+                      placeholder="Search by name or address"
+                      value={query}
+                      onChangeText={setQuery}
+                      autoCorrect={false}
+                    />
                   </Input>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <HStack space={'lg'} mt={'$10'}>
+                    <HStack space={'sm'} mt={'$5'} mb={'$2'}>
                       {verificationState.map(item => (
                         <Button
                           key={item.id}
@@ -92,7 +116,8 @@ export default function Verification() {
                               : theme.colors.grey[200]
                           }
                           borderWidth={'$1'}
-                          h={'$12'}
+                          h={'$10'}
+                          px={'$4'}
                           borderRadius={'$3xl'}
                           onPress={() => setFilter(item)}>
                           <ButtonText
@@ -137,9 +162,8 @@ export default function Verification() {
                   </Center>
                 </VStack>
               }
-              ItemSeparatorComponent={Separator}
               ListFooterComponent={<View h={'$32'} />}
-              data={data}
+              data={shown}
               renderItem={({item}) => (
                 <VerificationTable data={item} handclick={handleClick} />
               )}
