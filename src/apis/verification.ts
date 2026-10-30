@@ -54,13 +54,27 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
       providesTags: ['Verification'],
     }),
 
+    availableJobs: builder.query<
+      {data: {located: boolean; jobs: Array<TOpenJob>}},
+      {latitude?: number; longitude?: number}
+    >({
+      query: ({latitude, longitude}) => ({
+        url:
+          latitude !== undefined && longitude !== undefined
+            ? `${apis.AVAILABLE_JOBS}?latitude=${latitude}&longitude=${longitude}`
+            : apis.AVAILABLE_JOBS,
+        method: 'GET',
+      }),
+      providesTags: ['Jobs'],
+    }),
+
     acceptTask: builder.mutation<TTaskResponse, TTaskRequest>({
       query: credentials => ({
         url: apis.ACCEPT_TASK,
         method: 'POST',
         body: {...credentials},
       }),
-      invalidatesTags: ['Verification', 'Metrics', 'Profile', 'Wallet'],
+      invalidatesTags: ['Verification', 'Metrics', 'Profile', 'Wallet', 'Jobs'],
     }),
 
     addressStatus: builder.mutation<any, TAddressStatus>({
@@ -116,7 +130,20 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
   }),
 });
 
+export type TOpenJob = {
+  addressId: string;
+  verificationId: string;
+  address: string;
+  landmark?: string;
+  distance: number;
+  price?: number;
+  turnarroundTime?: string;
+  candidate: {firstName: string; lastName: string; phoneNumber: string};
+  createdAt: string;
+};
+
 export const {
+  useAvailableJobsQuery,
   useVerificationQuery,
   useAddressQuery,
   useAcceptTaskMutation,

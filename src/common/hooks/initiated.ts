@@ -8,6 +8,7 @@ import {
 } from '@/lib/push-notification';
 import {useLocation} from './location';
 import {useOffline} from './offline';
+import {useNearbyJobs} from './jobs';
 import {useNetInfo} from '@react-native-community/netinfo';
 
 export const useInitiated = () => {
@@ -38,6 +39,18 @@ export const useInitiated = () => {
     dispatch(setAbly(offer));
     dispatch(setAblyModal(true));
   };
+
+  // A job that appears in "Jobs near you" rings like a live offer, once per job.
+  const {jobs: nearbyJobs} = useNearbyJobs();
+  const seenJobs = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const fresh = nearbyJobs.filter(j => !seenJobs.current.has(j.addressId));
+    fresh.forEach(j => seenJobs.current.add(j.addressId));
+    if (fresh.length) {
+      showOffer(fresh[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nearbyJobs]);
 
   // The 60-second timer is created once, so it must read the latest values
   // through a ref. Reading them directly would keep the values from the first

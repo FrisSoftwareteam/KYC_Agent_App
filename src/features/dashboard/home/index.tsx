@@ -23,6 +23,7 @@ import {
 } from '@gluestack-ui/themed';
 import React from 'react';
 import {Header} from './header';
+import {NearbyJobs} from './nearby-jobs';
 import {theme} from '@/providers/theme-provider';
 import {Chart} from './chart';
 import {VerificationTable} from '@/common/component/table';
@@ -66,6 +67,7 @@ export function Home() {
             <FlatList
               ListHeaderComponent={
                 <View>
+                  <NearbyJobs />
                   <HStack
                     justifyContent={'space-between'}
                     alignItems={'center'}

@@ -10,6 +10,7 @@ export enum apis {
   SYNC_LOCATION = 'agents/sync-location',
   VERIFICATION = 'agents/verifications',
   ACCEPT_TASK = 'agents/accept-task',
+  AVAILABLE_JOBS = 'agents/available-jobs',
   SINGLE_ADDRESS = 'agents/addresses/',
   UPDATE_ADDRESS = 'agents/update-address',
   SUBMIT_ADDESS = 'agents/submit',
