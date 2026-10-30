@@ -10,11 +10,11 @@ import {setStatus} from '@/features/auth/slice';
 import {useProfileQuery} from '@/apis/auth';
 import {useOnRefresh} from './onrefresh';
 import {setAddressID} from '@/features/dashboard/slice';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {useIsOnline} from '@/common/hooks/online';
 
 export const useHome = () => {
   const dispatch = useAppDispatch();
-  const {isInternetReachable} = useNetInfo();
+  const isInternetReachable = useIsOnline();
   const {status} = useAppSelector(state => state.auth);
   const [filter, setFilter] = useState(dateData[0].value);
   const {navigate} = useNavigation<TNavigation>();

@@ -12,14 +12,14 @@ import {TNavigation} from '../types/navigation';
 import {setStatus, setUser, setWalkThrough} from '@/features/auth/slice';
 import {getToken} from '@/lib/push-notification';
 import {useDisclosure} from './useDisclosure';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {useIsOnline} from '@/common/hooks/online';
 
 export const useLogin = () => {
   const dispatch = useAppDispatch();
   const {location} = useAppSelector(state => state.ably);
   const {walkThroughSteps} = useAppSelector(state => state.auth);
   const {navigate} = useNavigation<TNavigation>();
-  const {isInternetReachable} = useNetInfo();
+  const isInternetReachable = useIsOnline();
   const [login, {isLoading}] = useLoginMutation();
   const [fcmToken] = useFcmTokenMutation();
   const [syncLocation] = useSyncLocationMutation();

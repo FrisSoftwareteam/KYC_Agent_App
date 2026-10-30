@@ -8,7 +8,7 @@ import {setToast} from '../component/toast/slice';
 import {useNavigation} from '@react-navigation/native';
 import {ERoutes} from '../enum/routes';
 import {TNavigation} from '../types/navigation';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {useIsOnline} from '@/common/hooks/online';
 import {clearCache} from '@/utils/base64-to-file';
 import {
   useImageUploadMutation,
@@ -23,7 +23,7 @@ export const useOffline = () => {
   const dispatch = useAppDispatch();
   const {navigate} = useNavigation<TNavigation>();
   const {isInitialized, data} = useAppSelector(state => state.offline);
-  const {isInternetReachable} = useNetInfo();
+  const isInternetReachable = useIsOnline();
   const [uploadImage] = useImageUploadMutation();
   const [submitAddress] = useSubmitAddressMutation();
   const [updateAddress] = useUpdateAddressInfoMutation();

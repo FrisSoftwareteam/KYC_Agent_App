@@ -9,12 +9,12 @@ import {setAddressID} from '@/features/dashboard/slice';
 import {useNavigation} from '@react-navigation/native';
 import {TNavigation} from '../types/navigation';
 import {ERoutes} from '../enum/routes';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {useIsOnline} from '@/common/hooks/online';
 import {setToast} from '../component/toast/slice';
 
 export const useVerification = () => {
   const {refreshing, onRefresh} = useOnRefresh();
-  const {isInternetReachable} = useNetInfo();
+  const isInternetReachable = useIsOnline();
   const {isOpen, onClose, onOpen} = useDisclosure();
   const dispatch = useAppDispatch();
   const {navigate} = useNavigation<TNavigation>();

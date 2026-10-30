@@ -20,7 +20,7 @@ import {setToast} from '../component/toast/slice';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import {Alert, PermissionsAndroid} from 'react-native';
 import {Platform} from 'react-native';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {useIsOnline} from '@/common/hooks/online';
 import {useOffline} from './offline';
 import {useLocation} from './location';
 import {formatDistance} from '@/utils/distance';
@@ -57,7 +57,7 @@ const audioRecorderPlayer = new AudioRecorderPlayer();
 
 export const useNewVerification = () => {
   const SignatureRef = useRef<SignatureViewRef>(null);
-  const {isInternetReachable} = useNetInfo();
+  const isInternetReachable = useIsOnline();
   const {navigate} = useNavigation<TNavigation>();
   const {params}: any = useRoute();
   const navigateData = params?.data;

@@ -14,7 +14,7 @@ import {Header} from './header';
 import {Table} from './table';
 import {notificationDateFormat} from '@/utils/date-format';
 import {useVerificationQuery} from '@/apis/verification';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {useIsOnline} from '@/common/hooks/online';
 
 const STATUS_TEXT: Record<string, string> = {
   accepted: 'Job accepted, not started yet',
@@ -33,7 +33,7 @@ const activityDate = (item: any) =>
 // Recent activity on the agent's own jobs, grouped by day (newest first).
 // This replaces the sample notifications the screen used to show.
 const useActivity = () => {
-  const {isInternetReachable} = useNetInfo();
+  const isInternetReachable = useIsOnline();
   const {data} = useVerificationQuery('?size=30', {skip: !isInternetReachable});
   return useMemo(() => {
     const items = [...(data?.data?.addresses || [])].sort(
