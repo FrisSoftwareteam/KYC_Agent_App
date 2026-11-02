@@ -1,7 +1,7 @@
 import {safeRefetch} from '@/utils/safe-refetch';
 import {dateData} from '@/features/dashboard/home/data';
-import {useNavigation} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useCallback, useEffect, useState} from 'react';
 import {ERoutes} from '../enum/routes';
 import {TNavigation} from '../types/navigation';
 import {useMetricsQuery, useTrendingQuery} from '@/apis/home';
@@ -23,12 +23,20 @@ export const useHome = () => {
     data: metricsData,
     isFetching,
     refetch,
-  } = useMetricsQuery(period, {skip: !isInternetReachable});
+  } = useMetricsQuery(period, {
+    skip: !isInternetReachable,
+    pollingInterval: 30000,
+    refetchOnMountOrArgChange: true,
+  });
   const {
     data: trendingData,
     isFetching: trendingIsLoading,
     refetch: trendingRefectch,
-  } = useTrendingQuery(period, {skip: !isInternetReachable});
+  } = useTrendingQuery(period, {
+    skip: !isInternetReachable,
+    pollingInterval: 30000,
+    refetchOnMountOrArgChange: true,
+  });
   const {data: profileData} = useProfileQuery('', {
     skip: !isInternetReachable,
   });
@@ -42,6 +50,15 @@ export const useHome = () => {
     const state = e ? 'online' : 'offline';
     dispatch(setStatus(state));
   };
+
+  // Fresh numbers every time the home screen is opened again.
+  useFocusEffect(
+    useCallback(() => {
+      if (isInternetReachable) {
+        safeRefetch(refetch, trendingRefectch);
+      }
+    }, [isInternetReachable, refetch, trendingRefectch]),
+  );
 
   useEffect(() => {
     if (refreshing) {
