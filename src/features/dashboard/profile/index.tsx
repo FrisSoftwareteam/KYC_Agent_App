@@ -17,6 +17,7 @@ import {
 } from '@gluestack-ui/themed';
 import {ChevronRight} from 'lucide-react-native';
 import React from 'react';
+import {formatNaira} from '@/common/hooks/wallet';
 
 export function Profile() {
   const {data, navigate, status, handleStatus, handleLogout, handleGuide} =
@@ -121,13 +122,38 @@ export function Profile() {
               />
             </HStack>
 
+            <Pressable onPress={() => navigate(ERoutes.WALLET)}>
+              <HStack
+                justifyContent={'space-between'}
+                alignItems={'center'}
+                borderColor={theme.colors.grey[500]}
+                borderTopWidth={'$1'}
+                mt={'$4'}
+                pt={'$8'}
+                pb={'$5'}>
+                <Text>Wallet</Text>
+                <HStack alignItems={'center'} space={'sm'}>
+                  <Text
+                    color={theme.colors.status.success}
+                    fontFamily={theme.fontFamily.medium}>
+                    {formatNaira(data?.data?.wallet?.withdrawable)}
+                  </Text>
+                  <ChevronRight
+                    width={20}
+                    height={20}
+                    color={theme.colors.grey.solid}
+                  />
+                </HStack>
+              </HStack>
+            </Pressable>
+
             <Pressable onPress={() => navigate(ERoutes.CHANGE_PASSWORD)}>
               <HStack
                 justifyContent={'space-between'}
                 borderColor={theme.colors.grey[500]}
                 borderBottomWidth={'$1'}
                 borderTopWidth={'$1'}
-                mt={'$4'}
+                mt={'$0'}
                 pt={'$8'}
                 pb={'$5'}>
                 <Text>Change Password</Text>

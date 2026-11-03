@@ -25,6 +25,9 @@ import {useOffline} from './offline';
 import {useLocation} from './location';
 import Config from 'react-native-config';
 
+const MAX_DISTANCE_METRES =
+  Number(Config.DISTANCE) > 0 ? Number(Config.DISTANCE) : 100;
+
 interface IFormInput {
   buildingType: string;
   buildingColor: string;
@@ -141,7 +144,7 @@ export const useNewVerification = () => {
 
   const handleNext = async (value?: string) => {
     if (step === 4) {
-      if (distance >= Config.DISTANCE) {
+      if (distance >= MAX_DISTANCE_METRES) {
         return dispatch(
           setToast({
             description: 'Stay within the range of 0 to 100m to the address',

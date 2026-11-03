@@ -11,4 +11,5 @@ export enum ERoutes {
   NOTIFICATION = 'notification',
   CHANGE_PASSWORD = 'change-password',
   EDIT_PROFILE = 'edit-profile',
+  WALLET = 'wallet',
 }

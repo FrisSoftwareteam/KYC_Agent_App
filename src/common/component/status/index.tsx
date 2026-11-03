@@ -7,6 +7,7 @@ export function Status({status}: {status: string}) {
     if (
       [
         'success',
+        'successful',
         'verified',
         'active',
         'completed',
@@ -55,7 +56,7 @@ export function Status({status}: {status: string}) {
         height={'auto'}
         fontFamily={theme.fontFamily.regular}
         textTransform={'capitalize'}>
-        {status.toLowerCase() === 'inprogress' ? 'in progress' : status}
+        {status?.toLowerCase() === 'inprogress' ? 'in progress' : status}
       </Text>
     </View>
   );

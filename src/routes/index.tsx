@@ -8,6 +8,7 @@ import {ChangePassword} from '@/features/auth/change-password';
 import {EditProfile} from '@/features/dashboard/profile/edit-profile';
 import {NewVerification} from '@/features/dashboard/verification/new-verification';
 import {useInitiated} from '@/common/hooks/initiated';
+import {Wallet} from '@/features/dashboard/wallet';
 
 export const AppRouter = () => {
   const RoutesStack = createNativeStackNavigator();
@@ -40,6 +41,11 @@ export const AppRouter = () => {
           <RoutesStack.Screen
             name={ERoutes.NEW_VERIFICATION}
             component={NewVerification}
+            options={{headerShown: false}}
+          />
+          <RoutesStack.Screen
+            name={ERoutes.WALLET}
+            component={Wallet}
             options={{headerShown: false}}
           />
         </Fragment>

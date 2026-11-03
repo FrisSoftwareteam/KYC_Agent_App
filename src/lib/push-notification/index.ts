@@ -1,6 +1,13 @@
 import messaging from '@react-native-firebase/messaging';
+import {PermissionsAndroid, Platform} from 'react-native';
 
 export async function requestUserPermission() {
+  // Android 13+ needs the user's permission before any notification can show
+  if (Platform.OS === 'android' && Number(Platform.Version) >= 33) {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+  }
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -27,8 +34,18 @@ export const notificationListener = () => {
   // });
 };
 
-export const getToken = async () => {
-  await messaging().registerDeviceForRemoteMessages();
-  const token = await messaging().getToken();
-  return token;
+// Returns the device's push token, or null if it cannot be obtained.
+// Login must still work without it (the agent just won't get push notifications).
+export const getToken = async (): Promise<string | null> => {
+  try {
+    await messaging().registerDeviceForRemoteMessages();
+    return await messaging().getToken();
+  } catch (error: any) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'Push notification token not available:',
+      error?.message || error,
+    );
+    return null;
+  }
 };

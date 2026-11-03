@@ -43,9 +43,9 @@ export function PermissionModal() {
                 fontFamily={theme.fontFamily.medium}
                 color={theme.colors.grey[200]}
                 fontSize={'$lg'}>
-                FirstCheckAgent needs both location and notification access to
-                function properly. Please grant permission in your app
-                settings.'
+                CléCheck Agent needs your location (to confirm visits) and
+                notifications (to receive new jobs). Tap Open Settings, allow
+                both, then come back to the app.
               </Text>
             </Center>
           </AlertDialogBody>
@@ -60,7 +60,7 @@ export function PermissionModal() {
                 <ButtonText
                   fontFamily={theme.fontFamily.regular}
                   color={theme.colors.primary.DEFAULT}>
-                  Cancel
+                  Close app
                 </ButtonText>
               </Button>
 
@@ -71,7 +71,7 @@ export function PermissionModal() {
                 w={'46%'}
                 onPress={() => Linking.openSettings()}>
                 <ButtonText fontFamily={theme.fontFamily.regular}>
-                  Goto Settings
+                  Open Settings
                 </ButtonText>
               </Button>
             </ButtonGroup>

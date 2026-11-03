@@ -17,4 +17,9 @@ export enum apis {
   UPLOAD_IMAGE = 'uploads/agents/images',
   UPLOAD_SIGNATURE = 'uploads/agents/signatures',
   UPLOAD_AUDIO = 'uploads/address/audio',
+  WITHDRAWALS = 'agents/withdrawals',
+  UPSERT_BANK = 'agents/upsert-bank',
+  WITHDRAW_FUND = 'agents/transactions/withdraw-fund',
+  BANKS = 'apps/banks',
+  RESOLVE_ACCOUNT = 'apps/resolve-account',
 }
