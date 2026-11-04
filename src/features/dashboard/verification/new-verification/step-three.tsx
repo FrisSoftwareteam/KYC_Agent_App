@@ -21,6 +21,26 @@ import {Info} from 'lucide-react-native';
 import React, {Fragment} from 'react';
 import {TouchableOpacity} from 'react-native';
 
+const Bullet = ({children}: {children: React.ReactNode}) => (
+  <HStack alignItems={'flex-start'} space={'xs'}>
+    <View
+      h={'$1.5'}
+      w={'$1.5'}
+      mt={'$2'}
+      bg={theme.colors.grey.solid}
+      borderRadius={'$full'}
+    />
+    <Text
+      flex={1}
+      fontFamily={theme.fontFamily.medium}
+      color={theme.colors.grey.solid}
+      lineHeight={'$md'}
+      fontSize={'$sm'}>
+      {children}
+    </Text>
+  </HStack>
+);
+
 const CommentSection = ({title, value, handleChange}: any) => (
   <VStack space={'sm'}>
     <Text
@@ -130,6 +150,37 @@ export function StepThree({
             Comment should be detailed and brief
           </Text>
         </HStack>
+      </VStack>
+      <VStack
+        mt={'$3'}
+        w={'$full'}
+        bg={'#F3F6FF'}
+        borderLeftWidth={3}
+        borderRadius={'$lg'}
+        px={'$4'}
+        py={'$2.5'}
+        space={'sm'}
+        borderLeftColor={theme.colors.primary.DEFAULT}>
+        <HStack alignItems={'center'} space={'xs'}>
+          <Info width={14} height={14} color={theme.colors.primary.DEFAULT} />
+          <Text
+            fontFamily={theme.fontFamily.medium}
+            color={theme.colors.primary.DEFAULT}
+            fontSize={'$md'}>
+            Field verification instructions
+          </Text>
+        </HStack>
+        <Bullet>
+          Do not photograph any person providing comments or information
+          during verification.
+        </Bullet>
+        <Bullet>
+          Exercise discretion when making enquiries and collecting information.
+        </Bullet>
+        <Bullet>
+          Conduct all verification activities professionally, without drawing
+          unnecessary attention or compromising the privacy of respondents.
+        </Bullet>
       </VStack>
 
       <VStack space={'lg'} mt={'$4'}>

@@ -4,6 +4,26 @@ import React from 'react';
 import {Info, Plus} from 'lucide-react-native';
 import {TouchableOpacity} from 'react-native';
 
+const Bullet = ({children}: {children: React.ReactNode}) => (
+  <HStack alignItems={'flex-start'} space={'xs'}>
+    <View
+      h={'$1.5'}
+      w={'$1.5'}
+      mt={'$2'}
+      bg={theme.colors.grey.solid}
+      borderRadius={'$full'}
+    />
+    <Text
+      flex={1}
+      fontFamily={theme.fontFamily.medium}
+      color={theme.colors.grey.solid}
+      lineHeight={'$md'}
+      fontSize={'$sm'}>
+      {children}
+    </Text>
+  </HStack>
+);
+
 const find = (data: any, name: string) => {
   const res = data?.find((item: {name: string}) => item.name === name);
   return res;
@@ -11,7 +31,7 @@ const find = (data: any, name: string) => {
 
 const UploadImageButton = ({onPress, image}: any) => (
   <View
-    w={'47%'}
+    w={'$full'}
     h={'$24'}
     borderStyle={'dashed'}
     borderWidth={'$1'}
@@ -45,13 +65,21 @@ const UploadImageButton = ({onPress, image}: any) => (
 );
 
 export const StepTwo = ({handleImageUpload, images}: any) => {
-  const renderImageOrButton = (imageKey: string) => {
+  const renderImageOrButton = (imageKey: string, label: string) => {
     const image = find(images, imageKey)?.value;
     return (
-      <UploadImageButton
-        onPress={() => handleImageUpload(imageKey)}
-        image={image}
-      />
+      <VStack w={'47%'} space={'xs'}>
+        <Text
+          fontFamily={theme.fontFamily.medium}
+          color={theme.colors.grey.solid}
+          fontSize={'$xs'}>
+          {label}
+        </Text>
+        <UploadImageButton
+          onPress={() => handleImageUpload(imageKey)}
+          image={image}
+        />
+      </VStack>
     );
   };
 
@@ -116,38 +144,15 @@ export const StepTwo = ({handleImageUpload, images}: any) => {
             </Text>
           </HStack>
 
-          <HStack alignItems={'center'} space={'xs'}>
-            <View
-              h={'$1.5'}
-              w={'$1.5'}
-              bg={theme.colors.grey.solid}
-              borderRadius={'$full'}
-            />
-            <Text
-              fontFamily={theme.fontFamily.medium}
-              color={theme.colors.grey.solid}
-              fontSize={'$sm'}>
-              Upload images of the building only
-            </Text>
-          </HStack>
-
-          <HStack alignItems={'center'} space={'xs'}>
-            <View
-              h={'$1.5'}
-              w={'$1.5'}
-              bg={theme.colors.grey.solid}
-              borderRadius={'$full'}
-              mb={'$4'}
-            />
-            <Text
-              fontFamily={theme.fontFamily.medium}
-              color={theme.colors.grey.solid}
-              lineHeight={'$md'}
-              fontSize={'$sm'}>
-              Images of the building gate/estate gate, floor or people around
-              are not permissible
-            </Text>
-          </HStack>
+          <Bullet>
+            Take these 3 photos: (1) the front view of the building, (2) the
+            side view of the building, (3) a distant view of the street showing
+            the building and its surroundings.
+          </Bullet>
+          <Bullet>
+            Photos must give a clear view of the property and its location. Do
+            not photograph people.
+          </Bullet>
         </VStack>
 
         <VStack>
@@ -159,10 +164,13 @@ export const StepTwo = ({handleImageUpload, images}: any) => {
           </Text>
           <VStack space={'lg'} mt={'$2'}>
             <HStack space={'lg'} w={'$full'}>
-              {renderImageOrButton('img1')}
-              {renderImageOrButton('img2')}
+              {renderImageOrButton('img1', '1. Front view of the building')}
+              {renderImageOrButton('img2', '2. Side view of the building')}
             </HStack>
-            {renderImageOrButton('img3')}
+            {renderImageOrButton(
+              'img3',
+              '3. Distant view of the street and surroundings',
+            )}
           </VStack>
         </VStack>
       </VStack>
