@@ -52,7 +52,7 @@ export const useInitiated = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nearbyJobs]);
 
-  // The 60-second timer is created once, so it must read the latest values
+  // The location timer is created once, so it must read the latest values
   // through a ref. Reading them directly would keep the values from the first
   // render (no user, no location yet) and the location would never be sent.
   const latest = useRef({
@@ -72,13 +72,15 @@ export const useInitiated = () => {
   const {location} = useAppSelector(state => state.ably);
   const hasLocation = Boolean(location?.coords);
 
+  // Every 20 seconds: while the agent is on a job, admin and the business follow
+  // the agent's movement on a live map from these positions.
   useEffect(() => {
     const timer = setInterval(() => {
       const now = latest.current;
       if (now.user?.id && now.isInternetReachable && now.locationPermission) {
         now.handleLocation(now.status);
       }
-    }, 60000);
+    }, 20000);
     return () => {
       clearInterval(timer);
     };
