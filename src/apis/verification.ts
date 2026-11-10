@@ -127,6 +127,15 @@ const VerificationApiFunction = apiSlice.injectEndpoints({
         body: credentials,
       }),
     }),
+
+    // A short video of the building (optional).
+    uploadVideo: builder.mutation<TUpload, FormData>({
+      query: credentials => ({
+        url: apis.UPLOAD_VIDEO,
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
   }),
 });
 
@@ -138,6 +147,7 @@ export type TOpenJob = {
   distance: number;
   price?: number;
   turnarroundTime?: string;
+  alias?: string;
   candidate: {firstName: string; lastName: string; phoneNumber: string};
   createdAt: string;
 };
@@ -153,4 +163,5 @@ export const {
   useUpdateAddressInfoMutation,
   useSubmitAddressMutation,
   useUploadAudioMutation,
+  useUploadVideoMutation,
 } = VerificationApiFunction;

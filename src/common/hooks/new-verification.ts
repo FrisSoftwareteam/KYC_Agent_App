@@ -12,6 +12,7 @@ import {
   useUpdateAddressInfoMutation,
   useUploadSignatureMutation,
   useUploadAudioMutation,
+  useUploadVideoMutation,
 } from '@/apis/verification';
 import {launchCamera} from 'react-native-image-picker';
 import {SignatureViewRef} from 'react-native-signature-canvas';
@@ -75,6 +76,9 @@ export const useNewVerification = () => {
   const [uploadSignature, {isLoading: signatoryIsLoading}] =
     useUploadSignatureMutation();
   const [uploadAudio, {isLoading: audioIsLoading}] = useUploadAudioMutation();
+  const [uploadVideo, {isLoading: videoIsLoading}] = useUploadVideoMutation();
+  // Optional video of the building, up to 30 seconds.
+  const [video, setVideo] = useState<string>('');
   const {data, isFetching} = useAddressQuery(navigateData as string, {
     skip: !navigateData || !isInternetReachable,
   });
@@ -119,7 +123,13 @@ export const useNewVerification = () => {
     } else if (step === 2) {
       return Boolean(images.length === 3);
     } else if (step === 3) {
-      return Object.values(notes).some(val => Boolean(val));
+      // A written comment, a voice comment and a video of the building are all
+      // required: admin reviews them, and the client sees them once approved.
+      return (
+        Object.values(notes).some(val => Boolean(val)) &&
+        recorded &&
+        Boolean(video)
+      );
     } else {
       if (confirmSignature || signature) {
         return true;
@@ -203,6 +213,7 @@ export const useNewVerification = () => {
           signatoryPath: signatoryPath,
           signature: signature,
           audio: audioPath,
+          video,
           _id: data?.data?._id || navigateData,
           status: value,
           position: {
@@ -227,7 +238,7 @@ export const useNewVerification = () => {
       try {
         // Each upload is kept apart, so a missing signature or voice note can
         // never shift another file's link into the wrong field.
-        const [imageResults, signatoryRes, audioRes] = await Promise.all([
+        const [imageResults, signatoryRes, videoRes, audioRes] = await Promise.all([
           Promise.all(
             images.slice(0, 3).map(img => uploadImage(imageForm(img)).unwrap()),
           ),
@@ -243,6 +254,22 @@ export const useNewVerification = () => {
                   return form;
                 })(),
               ).unwrap()
+            : Promise.resolve(undefined),
+          video
+            ? uploadVideo(
+                (() => {
+                  const form = new FormData();
+                  form.append('video', {
+                    uri: video,
+                    name: 'building.mp4',
+                    type: 'video/mp4',
+                  } as any);
+                  form.append('addressId', addressId);
+                  return form;
+                })(),
+              )
+                .unwrap()
+                .catch(() => undefined)
             : Promise.resolve(undefined),
           audioPath
             ? uploadAudio(
@@ -271,6 +298,7 @@ export const useNewVerification = () => {
           gateColor: payload.gateColor,
           closestLandmark: payload.closestLandmark,
           audioUrl: audioRes?.data?.url || '',
+          ...(videoRes?.data?.url ? {videoUrl: videoRes.data.url} : undefined),
         };
         await updateAddress({...addressPayload}).unwrap();
         // Only report success once the server has accepted the submission.
@@ -323,6 +351,33 @@ export const useNewVerification = () => {
       setStep(step - 1);
     }
   };
+
+  // A short video of the building: up to 30 seconds, low quality to keep it small.
+  const handleRecordVideo = async () => {
+    const result: any = await launchCamera({
+      mediaType: 'video',
+      durationLimit: 30,
+      videoQuality: 'low',
+      saveToPhotos: false,
+    } as any);
+    if (result?.errorCode) {
+      dispatch(
+        setToast({
+          title: 'Camera not available',
+          description:
+            result.errorCode === 'permission'
+              ? 'Allow camera access for CleCheck Agent in your phone settings.'
+              : result.errorMessage || 'Please try again.',
+          type: 'error',
+        }),
+      );
+      return;
+    }
+    if (!result?.didCancel && result?.assets?.[0]?.uri) {
+      setVideo(result.assets[0].uri);
+    }
+  };
+  const handleRemoveVideo = () => setVideo('');
 
   const handleImageUpload = async (value: string) => {
     const result: any = await launchCamera(options as any);
@@ -539,6 +594,9 @@ export const useNewVerification = () => {
     handleEnd,
     onStartRecord,
     onStopRecord,
+    handleRecordVideo,
+    handleRemoveVideo,
+    video,
     onStartPlay,
     onPausePlay,
     handleRedoSignature,
@@ -560,7 +618,8 @@ export const useNewVerification = () => {
         signatoryIsLoading ||
         isLoading ||
         submitIsLoading ||
-        audioIsLoading,
+        audioIsLoading ||
+        videoIsLoading,
     ),
   };
 };

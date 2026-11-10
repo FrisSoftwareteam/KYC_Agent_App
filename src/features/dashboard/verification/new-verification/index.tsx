@@ -38,6 +38,9 @@ export function NewVerification() {
     handleEnd,
     onStartRecord,
     onStopRecord,
+    handleRecordVideo,
+    handleRemoveVideo,
+    video,
     onStartPlay,
     onPausePlay,
     handleRedoSignature,
@@ -170,6 +173,9 @@ export function NewVerification() {
                       recorded={recorded}
                       playTime={playTime}
                       play={play}
+                      video={video}
+                      onRecordVideo={handleRecordVideo}
+                      onRemoveVideo={handleRemoveVideo}
                     />
                   )}
 

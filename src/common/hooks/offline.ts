@@ -15,6 +15,7 @@ import {
   useSubmitAddressMutation,
   useUpdateAddressInfoMutation,
   useUploadAudioMutation,
+  useUploadVideoMutation,
   useUploadSignatureMutation,
 } from '@/apis/verification';
 import {useEffect} from 'react';
@@ -29,6 +30,7 @@ export const useOffline = () => {
   const [updateAddress] = useUpdateAddressInfoMutation();
   const [uploadSignature] = useUploadSignatureMutation();
   const [uploadAudio] = useUploadAudioMutation();
+  const [uploadVideo] = useUploadVideoMutation();
 
   const handleSyncData = async ({
     payload,
@@ -37,6 +39,7 @@ export const useOffline = () => {
     signature,
     signatoryPath,
     audio,
+    video,
     _id,
     status,
     position,
@@ -51,6 +54,7 @@ export const useOffline = () => {
           signature,
           signatoryPath,
           audio,
+          video,
           _id,
           status,
           position,
@@ -124,6 +128,24 @@ export const useOffline = () => {
               : Promise.resolve(undefined),
           ]);
 
+          // The building video, saved with the visit while offline.
+          const videoRes = item?.video
+            ? await uploadVideo(
+                (() => {
+                  const form = new FormData();
+                  form.append('video', {
+                    uri: item?.video,
+                    name: 'building.mp4',
+                    type: 'video/mp4',
+                  } as any);
+                  form.append('addressId', item?._id);
+                  return form;
+                })(),
+              )
+                .unwrap()
+                .catch(() => undefined)
+            : undefined;
+
           await updateAddress({
             address: item?._id,
             signature: signatoryRes?.data?.url || item?.signature,
@@ -136,6 +158,7 @@ export const useOffline = () => {
             gateColor: item?.payload.gateColor,
             closestLandmark: item?.payload.closestLandmark,
             audioUrl: audioRes?.data?.url || '',
+            ...(videoRes?.data?.url ? {videoUrl: videoRes.data.url} : {}),
           }).unwrap();
 
           await submitAddress({

@@ -14,6 +14,7 @@ type State = {
     landmark?: string;
     price?: number | string;
     turnarroundTime?: string;
+    alias?: string;
   };
 
   location: null | {

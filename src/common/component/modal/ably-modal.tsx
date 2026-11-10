@@ -71,6 +71,15 @@ export function AblyModal() {
                   : (data?.address as any)?.formatAddress}
               </Text>
             </Text>
+            {Boolean(data?.alias) && (
+              <Text
+                fontFamily={theme.fontFamily.medium}
+                color={theme.colors.grey[200]}
+                fontSize={'$md'}>
+                Alias:{' '}
+                <Text color={theme.colors.grey.solid}>{data?.alias}</Text>
+              </Text>
+            )}
             {Boolean(data?.landmark) && (
               <Text
                 fontFamily={theme.fontFamily.medium}

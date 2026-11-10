@@ -100,6 +100,7 @@ export function NearbyJobs() {
                 {`${job.candidate?.firstName || ''} ${
                   job.candidate?.lastName || ''
                 }`.trim() || 'Candidate'}
+                {job.alias ? ` (${job.alias})` : ''}
               </Text>
               {Number(job.price) > 0 ? (
                 <Text fontFamily={theme.fontFamily.bold} color={'#05624F'}>

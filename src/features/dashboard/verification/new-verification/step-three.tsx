@@ -71,6 +71,9 @@ export function StepThree({
   recorded,
   playTime,
   play,
+  video,
+  onRecordVideo,
+  onRemoveVideo,
 }: any) {
   return (
     <View>
@@ -189,8 +192,14 @@ export function StepThree({
             fontFamily={theme.fontFamily.medium}
             color={theme.colors.grey[200]}
             fontSize={'$md'}>
-            Voice Comment
+            Voice Comment (required)
           </Text>
+          {!recorded && !recording && (
+            <Text fontSize={'$xs'} color={theme.colors.grey[200]}>
+              Say what you found at the address. You cannot continue without a
+              voice comment.
+            </Text>
+          )}
 
           {!recorded ? (
             <HStack
@@ -320,6 +329,43 @@ export function StepThree({
               </HStack>
             </HStack>
           )}
+        </VStack>
+
+        <VStack space={'sm'}>
+          <Text
+            fontFamily={theme.fontFamily.medium}
+            color={theme.colors.grey[200]}
+            fontSize={'$md'}>
+            Video of the building (required, up to 30 seconds)
+          </Text>
+          <HStack
+            borderColor={theme.colors.grey[400]}
+            h={'$12'}
+            borderWidth={'$1'}
+            borderRadius={'$sm'}
+            px={'$3'}
+            alignItems={'center'}
+            justifyContent={'space-between'}>
+            <Text
+              fontFamily={theme.fontFamily.regular}
+              color={video ? theme.colors.grey.solid : theme.colors.grey[200]}>
+              {video ? 'Video recorded' : 'Walk round the front of the building'}
+            </Text>
+            <HStack space={'md'}>
+              {video ? (
+                <TouchableOpacity onPress={onRemoveVideo}>
+                  <DeleteLogo />
+                </TouchableOpacity>
+              ) : null}
+              <TouchableOpacity onPress={onRecordVideo}>
+                <Text
+                  fontFamily={theme.fontFamily.medium}
+                  color={theme.colors.primary.DEFAULT}>
+                  {video ? 'Retake' : 'Record video'}
+                </Text>
+              </TouchableOpacity>
+            </HStack>
+          </HStack>
         </VStack>
 
         <CommentSection
