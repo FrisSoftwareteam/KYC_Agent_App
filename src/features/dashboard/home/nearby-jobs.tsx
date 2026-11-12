@@ -102,6 +102,14 @@ export function NearbyJobs() {
                 }`.trim() || 'Candidate'}
                 {job.alias ? ` (${job.alias})` : ''}
               </Text>
+              {Boolean(job.jobLabel) && (
+                <Text
+                  fontSize={'$xs'}
+                  color={'#7A4B00'}
+                  fontFamily={theme.fontFamily.medium}>
+                  {job.jobLabel}
+                </Text>
+              )}
               {Number(job.price) > 0 ? (
                 <Text fontFamily={theme.fontFamily.bold} color={'#05624F'}>
                   ₦{Number(job.price).toLocaleString()}

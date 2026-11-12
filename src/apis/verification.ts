@@ -148,6 +148,7 @@ export type TOpenJob = {
   price?: number;
   turnarroundTime?: string;
   alias?: string;
+  jobLabel?: string;
   candidate: {firstName: string; lastName: string; phoneNumber: string};
   createdAt: string;
 };

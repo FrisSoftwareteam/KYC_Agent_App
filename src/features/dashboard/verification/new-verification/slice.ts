@@ -13,6 +13,7 @@ type State = {
     status: string;
     googleMapUrl: string;
     position: any;
+    jobLabel?: string;
   }>;
 };
 

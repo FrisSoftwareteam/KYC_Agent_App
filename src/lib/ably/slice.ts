@@ -15,6 +15,7 @@ type State = {
     price?: number | string;
     turnarroundTime?: string;
     alias?: string;
+    jobLabel?: string;
   };
 
   location: null | {

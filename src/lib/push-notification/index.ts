@@ -28,6 +28,7 @@ type TOffer = {
   price?: string;
   turnarroundTime?: string;
   alias?: string;
+  jobLabel?: string;
   candidate: {firstName: string; lastName: string; phoneNumber: string};
 };
 
@@ -52,6 +53,7 @@ const toOffer = (remoteMessage: any): TOffer | null => {
     price: d.price,
     turnarroundTime: d.turnarroundTime,
     alias: d.alias,
+    jobLabel: d.jobLabel,
     candidate: {
       firstName: d.candidateFirstName || '',
       lastName: d.candidateLastName || '',

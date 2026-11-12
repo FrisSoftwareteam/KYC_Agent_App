@@ -125,6 +125,18 @@ export function Sheet({isOpen, onClose, data, handleNewVerification}: TSheet) {
                   </Text>
                 </VStack>
 
+                {Boolean(data?.jobLabel) && (
+                  <Text
+                    color={'#7A4B00'}
+                    bg={'#FFF7E6'}
+                    p={'$2'}
+                    borderRadius={'$sm'}
+                    fontFamily={theme.fontFamily.medium}
+                    fontSize={'$sm'}>
+                    {data?.jobLabel}
+                  </Text>
+                )}
+
                 <VStack space={'sm'}>
                   <Text
                     color={theme.colors.grey[200]}

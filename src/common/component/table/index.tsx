@@ -78,6 +78,15 @@ export function VerificationTable({data, handclick}: TVerification) {
               {formatDate(data?.createdAt)}
               {data?.category ? `  ·  ${data.category}` : ''}
             </Text>
+            {Boolean(data?.jobLabel) && (
+              <Text
+                fontSize={'$xs'}
+                color={'#7A4B00'}
+                fontFamily={theme.fontFamily.medium}
+                isTruncated>
+                {data?.jobLabel}
+              </Text>
+            )}
           </VStack>
           <ChevronRight width={18} height={18} color={theme.colors.grey[300]} />
         </HStack>

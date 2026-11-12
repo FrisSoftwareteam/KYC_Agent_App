@@ -58,6 +58,7 @@ export function NewVerification() {
     distance,
     hasLocation,
     maxDistance,
+    jobLabel,
   } = useNewVerification();
   // Stop the page scrolling while the agent draws a signature, so strokes are not lost.
   const [scrollEnabled, setScrollEnabled] = useState(true);
@@ -146,6 +147,23 @@ export function NewVerification() {
                     : 'Location found.'}
                 </Text>
               </View>
+
+              {Boolean(jobLabel) && (
+                <View
+                  mt={'$3'}
+                  p={'$3'}
+                  borderRadius={'$md'}
+                  bg={'#FFF7E6'}
+                  borderWidth={1}
+                  borderColor={'#F5C36B'}>
+                  <Text
+                    fontFamily={theme.fontFamily.medium}
+                    color={'#7A4B00'}
+                    fontSize={'$sm'}>
+                    {jobLabel}
+                  </Text>
+                </View>
+              )}
 
               <VStack space={'4xl'} h={'$full'}>
                 <View mt={'$6'}>

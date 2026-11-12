@@ -71,6 +71,14 @@ export function AblyModal() {
                   : (data?.address as any)?.formatAddress}
               </Text>
             </Text>
+            {Boolean(data?.jobLabel) && (
+              <Text
+                fontFamily={theme.fontFamily.medium}
+                color={'#7A4B00'}
+                fontSize={'$md'}>
+                {data?.jobLabel}
+              </Text>
+            )}
             {Boolean(data?.alias) && (
               <Text
                 fontFamily={theme.fontFamily.medium}

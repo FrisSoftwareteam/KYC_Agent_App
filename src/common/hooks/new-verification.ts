@@ -580,7 +580,12 @@ export const useNewVerification = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [play]);
 
+  // Credit and Loans KYC: which address this is and what to confirm.
+  const jobLabel: string =
+    (data as any)?.data?.jobLabel || (singleData as any)?.jobLabel || '';
+
   return {
+    jobLabel,
     data: singleData ? singleData : data,
     payload,
     step,
