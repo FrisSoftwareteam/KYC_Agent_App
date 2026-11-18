@@ -8,6 +8,7 @@ export enum ERoutes {
   PROFILE = 'profile',
   VERIFICATION = 'verification',
   NEW_VERIFICATION = 'new-verification',
+  ONSITE_FORM = 'onsite-form',
   NOTIFICATION = 'notification',
   CHANGE_PASSWORD = 'change-password',
   EDIT_PROFILE = 'edit-profile',
