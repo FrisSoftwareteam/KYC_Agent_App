@@ -9,6 +9,7 @@ import {EditProfile} from '@/features/dashboard/profile/edit-profile';
 import {NewVerification} from '@/features/dashboard/verification/new-verification';
 import {useInitiated} from '@/common/hooks/initiated';
 import {Wallet} from '@/features/dashboard/wallet';
+import {OnsiteForm} from '@/features/dashboard/verification/onsite-form';
 
 export const AppRouter = () => {
   const RoutesStack = createNativeStackNavigator();
@@ -41,6 +42,11 @@ export const AppRouter = () => {
           <RoutesStack.Screen
             name={ERoutes.NEW_VERIFICATION}
             component={NewVerification}
+            options={{headerShown: false}}
+          />
+          <RoutesStack.Screen
+            name={ERoutes.ONSITE_FORM}
+            component={OnsiteForm}
             options={{headerShown: false}}
           />
           <RoutesStack.Screen

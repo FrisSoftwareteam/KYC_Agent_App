@@ -23,6 +23,14 @@ import {StepFour} from './step-four';
 import {ButtonSpinner} from '@gluestack-ui/themed';
 import {Submit} from './submit';
 import {useDisclosure} from '@/common/hooks/useDisclosure';
+import {useNavigation, useRoute, useFocusEffect} from '@react-navigation/native';
+import {useOnsiteFormQuery} from '@/apis/onsite-form';
+import {ERoutes} from '@/common/enum/routes';
+import {TNavigation} from '@/common/types/navigation';
+import {useAppDispatch} from '@/common/hooks/redux';
+import {setToast} from '@/common/component/toast/slice';
+import {useIsOnline} from '@/common/hooks/online';
+import {missingInForm} from '../onsite-form/missing';
 
 export function NewVerification() {
   const {isOpen, onOpen, onClose} = useDisclosure();
@@ -60,6 +68,41 @@ export function NewVerification() {
     maxDistance,
     jobLabel,
   } = useNewVerification();
+  // Credit and Loans KYC: the onsite KYC form, on the visit at the business.
+  const {navigate} = useNavigation<TNavigation>();
+  const {params}: any = useRoute();
+  const addressId: string = params?.data;
+  const dispatch = useAppDispatch();
+  const online = useIsOnline();
+  const onsite = useOnsiteFormQuery(addressId, {skip: !addressId || !online});
+  useFocusEffect(
+    React.useCallback(() => {
+      if (addressId && online) {
+        onsite.refetch();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [addressId, online]),
+  );
+  const onsiteForm = onsite.data?.data;
+  const onsiteMissing = onsiteForm?.applies
+    ? missingInForm(onsiteForm.definition, onsiteForm.answers || {})
+    : [];
+  const openOnsite = () => navigate(ERoutes.ONSITE_FORM, {addressId});
+  // A verified visit needs the form complete; a not-verified one does not.
+  const submitVisit = (value?: string, reason?: string) => {
+    if (value === 'verified' && onsiteForm?.applies && onsiteMissing.length) {
+      onClose();
+      dispatch(
+        setToast({
+          title: 'Finish the onsite KYC form first',
+          description: `${onsiteMissing.length} required answers still needed.`,
+          type: 'error',
+        }),
+      );
+      return openOnsite();
+    }
+    return handleNext(value, reason);
+  };
   // Stop the page scrolling while the agent draws a signature, so strokes are not lost.
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const far =
@@ -165,6 +208,29 @@ export function NewVerification() {
                 </View>
               )}
 
+              {Boolean(onsiteForm?.applies) && (
+                <TouchableOpacity onPress={openOnsite}>
+                  <View
+                    mt={'$3'}
+                    p={'$3'}
+                    borderRadius={'$md'}
+                    borderWidth={1}
+                    borderColor={onsiteMissing.length ? '#F5C36B' : '#75E0A7'}
+                    bg={onsiteMissing.length ? '#FFFAEB' : '#ECFDF3'}>
+                    <Text
+                      fontFamily={theme.fontFamily.medium}
+                      color={theme.colors.primary.DEFAULT}>
+                      Onsite KYC form (Credit and Loans)
+                    </Text>
+                    <Text fontSize={'$sm'} color={theme.colors.grey.solid}>
+                      {onsiteMissing.length
+                        ? `${onsiteMissing.length} required answers still needed. Tap to fill it in.`
+                        : 'Complete. Tap to review or change it.'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+
               <VStack space={'4xl'} h={'$full'}>
                 <View mt={'$6'}>
                   {step === 1 && (
@@ -256,7 +322,7 @@ export function NewVerification() {
           </Center>
         </ScrollView>
       </SafeAreaView>
-      <Submit isOpen={isOpen} onClose={onClose} handleSubmit={handleNext} />
+      <Submit isOpen={isOpen} onClose={onClose} handleSubmit={submitVisit} />
     </View>
   );
 }
