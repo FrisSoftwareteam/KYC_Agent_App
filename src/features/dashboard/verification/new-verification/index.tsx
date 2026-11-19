@@ -90,7 +90,12 @@ export function NewVerification() {
   const openOnsite = () => navigate(ERoutes.ONSITE_FORM, {addressId});
   // A verified visit needs the form complete; a not-verified one does not.
   const submitVisit = (value?: string, reason?: string) => {
-    if (value === 'verified' && onsiteForm?.applies && onsiteMissing.length) {
+    if (
+      value === 'verified' &&
+      onsiteForm?.applies &&
+      onsiteForm?.required !== false &&
+      onsiteMissing.length
+    ) {
       onClose();
       dispatch(
         setToast({

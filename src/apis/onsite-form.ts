@@ -40,6 +40,8 @@ export type TOnsiteSection = {
 
 export type TOnsiteForm = {
   applies: boolean;
+  // false: the form can be skipped for now (the server switch is off).
+  required?: boolean;
   addressId?: string;
   definition?: TOnsiteSection[];
   prefill?: Record<string, any>;
