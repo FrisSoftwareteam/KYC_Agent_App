@@ -1,5 +1,6 @@
 # Builds the CléCheck agent app for Android on GitHub's servers.
-# Run it from the repo's Actions tab: "Build Android app" > Run workflow (choose the branch).
+# It runs by itself on every push to credit-loans-onsite-form. Once this file is on the
+# default branch, it can also be run by hand: Actions > "Build Android app" > Run workflow.
 # Download the result from the run's Artifacts section:
 #   - clecheck-agent-<version>.apk : install on a test phone
 #   - clecheck-agent-<version>.aab : upload to Google Play (only if the company release key is set)
@@ -12,6 +13,9 @@
 name: Build Android app
 
 on:
+  # Every push to the onsite-form branch builds it (with the default settings below).
+  push:
+    branches: [credit-loans-onsite-form]
   workflow_dispatch:
     inputs:
       api_url:
@@ -46,8 +50,8 @@ jobs:
       - name: Write app settings (.env)
         env:
           ABLY_KEY: ${{ secrets.ABLY_KEY }}
-          API_URL: ${{ inputs.api_url }}
-          DISTANCE: ${{ inputs.distance }}
+          API_URL: ${{ inputs.api_url || 'https://firstcheckapi.firstregistrarsnigeria.com/v1/' }}
+          DISTANCE: ${{ inputs.distance || '100' }}
         run: |
           if [ -z "$ABLY_KEY" ]; then echo "::error::Add the ABLY_KEY repository secret first (Settings > Secrets and variables > Actions)."; exit 1; fi
           case "$API_URL" in https://*/) ;; *) echo "::error::api_url must start with https:// and end with /"; exit 1;; esac
